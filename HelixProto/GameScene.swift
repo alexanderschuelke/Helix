@@ -15,12 +15,14 @@ class GameScene: SKScene {
     private var background = SKSpriteNode(imageNamed: "alt_background")
     // The parts represent the individual pieces of the DNA. Each part can hold a tone.
     private var parts: [SKSpriteNode] = []
+    private var rightParts: [SKSpriteNode] = []
     // The bases that are available for the user on the right of the screen
     private var bases: [Int:SKSpriteNode] = [:]
     // All the bases that were assigned to the DNA
     private var basesOnDna: [SKSpriteNode] = []
     // All DNA parts are listed here with according bases
     private var BasesByParts: [(SKSpriteNode, SKSpriteNode?)] = []
+    
     
     private let audioManager = AudioManager()
     
@@ -42,6 +44,13 @@ class GameScene: SKScene {
             part.anchorPoint = CGPoint(x: 0.5, y: 0.5)
             parts.append(part)
             BasesByParts.append((part, nil))
+        }
+        
+        for index in 0...11 {
+            let part = SKSpriteNode(imageNamed: "circle")
+            part.zPosition = 0
+            part.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+            rightParts.append(part)
         }
         
         // Create the 4 bases available for the user
@@ -74,13 +83,18 @@ class GameScene: SKScene {
         // Build the dna string, part by part
         for (index, part) in parts.enumerated() {
             addChild(part)
-            part.position = CGPoint(x: self.frame.size.width / 2.8, y: (self.frame.size.height - part.frame.size.height * 2 * CGFloat(index)))
+            part.position = CGPoint(x: self.frame.size.width / 2.8, y: (self.frame.size.height - part.frame.size.height * 1.5 * CGFloat(index)))
             
         }
         
+        for (index, part) in rightParts.enumerated() {
+            addChild(part)
+            part.position = CGPoint(x: self.frame.size.width / 1.6, y: (self.frame.size.height - part.frame.size.height * 1.5 * CGFloat(index)))
+        }
+
         // Position the 4 bases
         for (index, base) in bases {
-            addChild(base)
+//            addChild(base)
             base.anchorPoint = CGPoint(x: 0, y: 0.5)
             base.zPosition = -1
             base.name = "tone\(index+1)"
@@ -90,7 +104,7 @@ class GameScene: SKScene {
         
         let playButton = SKSpriteNode(imageNamed: "playButton")
         playButton.name = "playButton"
-        addChild(playButton)
+//        addChild(playButton)
         playButton.zPosition = 99
         playButton.position = CGPoint(x: self.frame.size.width / 1.58, y: self.frame.size.height / 7.7)
         playButton.scale(to: CGSize(width: playButton.size.width * CGFloat(1.5), height: playButton.size.height * CGFloat(1.5)))
@@ -101,6 +115,7 @@ class GameScene: SKScene {
         self.view!.addGestureRecognizer(panRecognizer)
 
         audioManager.delegate = self
+        twist()
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -114,6 +129,8 @@ class GameScene: SKScene {
             print(newSequencerPosition)
             highlightBase()
         }
+        
+        
        
     }
     
@@ -335,6 +352,42 @@ class GameScene: SKScene {
             }
         }
     }
+    
+    
+    func twist() {
+
+        for (index, part) in parts.enumerated() {
+            
+            let wait = SKAction.wait(forDuration: Double(index) / Double(6))
+//            let move = SKAction.moveTo(x: self.frame.width / 1.6, duration: 1)
+            let move2 = SKAction.moveBy(x: rightParts.first!.position.x - part.position.x, y: 0, duration: 1)
+            move2.timingMode = .easeInEaseOut
+            let reversed = move2.reversed()
+            let sequence = SKAction.sequence([move2, reversed])
+            let repeatSequence = SKAction.repeatForever(sequence)
+            
+            let finalSequence = SKAction.sequence([wait, repeatSequence])
+
+            part.run(finalSequence)
+        }
+        
+        for (index, part) in rightParts.enumerated() {
+            
+            let wait = SKAction.wait(forDuration: Double(index) / Double(6))
+            //            let move = SKAction.moveTo(x: self.frame.width / 1.6, duration: 1)
+            let move2 = SKAction.moveBy(x: parts.first!.position.x - part.position.x, y: 0, duration: 1)
+            move2.timingMode = .easeInEaseOut
+            let reversed = move2.reversed()
+            let sequence = SKAction.sequence([move2, reversed])
+            let repeatSequence = SKAction.repeatForever(sequence)
+            
+            let finalSequence = SKAction.sequence([wait, repeatSequence])
+            
+            part.run(finalSequence)
+        }
+    }
+    
+    
     
 }
 
