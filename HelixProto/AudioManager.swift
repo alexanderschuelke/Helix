@@ -67,7 +67,7 @@ class AudioManager {
     }
     
     // Responsible for creating the audio with the sequencer by considering the provided bases in the DNA.
-    private func updateLoop() {
+    public func updateLoop() {
         
         guard let basesByParts = delegate?.getBasesByParts() else {
             return

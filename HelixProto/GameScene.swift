@@ -107,10 +107,11 @@ class GameScene: SKScene {
         // Called before each frame is rendered
         
         let newSequencerPosition = Int(audioManager.sequencer.currentRelativePosition.beats)
-print(audioManager.sequencer.length)
-        if currentSequencerPosition != newSequencerPosition && audioManager.sequencer.isPlaying {
 
-                    print(newSequencerPosition)
+        if currentSequencerPosition != newSequencerPosition && audioManager.sequencer.isPlaying {
+            currentSequencerPosition = newSequencerPosition
+            audioManager.updateLoop()
+            print(newSequencerPosition)
             highlightBase()
         }
        
@@ -318,8 +319,8 @@ print(audioManager.sequencer.length)
     func highlightBase() {
         
         var newSequencerPosition = Int(audioManager.sequencer.currentRelativePosition.beats)
-        
 
+        
         let currentPart = parts[newSequencerPosition]
 
         for (part, base) in BasesByParts {
