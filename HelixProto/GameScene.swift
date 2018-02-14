@@ -22,7 +22,7 @@ class GameScene: SKScene {
     private var basesOnDna: [SKSpriteNode] = []
     // All DNA parts are listed here with according bases
     private var BasesByParts: [(SKSpriteNode, SKSpriteNode?)] = []
-    
+    private var rightBasesByParts: [(SKSpriteNode, SKSpriteNode?)] = []
     
     private let audioManager = AudioManager()
     
@@ -51,6 +51,7 @@ class GameScene: SKScene {
             part.zPosition = 0
             part.anchorPoint = CGPoint(x: 0.5, y: 0.5)
             rightParts.append(part)
+            rightBasesByParts.append((part, nil))
         }
         
         // Create the 4 bases available for the user
@@ -102,6 +103,7 @@ class GameScene: SKScene {
             base.position = CGPoint(x: self.frame.size.width / 1.68, y: (self.frame.size.height / 2) + (overallHeight / 2) - (base.frame.size.height * 3 * CGFloat(index)))
         }
         
+        
         let playButton = SKSpriteNode(imageNamed: "playButton")
         playButton.name = "playButton"
 //        addChild(playButton)
@@ -109,13 +111,45 @@ class GameScene: SKScene {
         playButton.position = CGPoint(x: self.frame.size.width / 1.58, y: self.frame.size.height / 7.7)
         playButton.scale(to: CGSize(width: playButton.size.width * CGFloat(1.5), height: playButton.size.height * CGFloat(1.5)))
         
+        for part in parts {
+            let newBase = SKSpriteNode(imageNamed: "square_base1")
+            newBase.name = "tone1"
+            addChild(newBase)
+            newBase.anchorPoint = CGPoint(x: 1, y: 0.5)
+            newBase.zPosition = -1
+            newBase.size = CGSize(width: (rightParts.first!.position.x - parts.first!.position.x) / 2, height: newBase.frame.height)
+            newBase.position = CGPoint(x: parts.first!.position.x + (rightParts.first!.position.x - parts.first!.position.x) / 2, y: part.position.y)
+            print(newBase.position.x)
+            for (index, value) in BasesByParts.enumerated() {
+                if value.0 == part {
+                    BasesByParts[index] = (value.0, newBase)
+                }
+            }
+        }
         
+        for part in rightParts {
+            let newBase = SKSpriteNode(imageNamed: "square_base3")
+            newBase.name = "tone1"
+            addChild(newBase)
+            newBase.anchorPoint = CGPoint(x: 0, y: 0.5)
+            newBase.zPosition = -1
+            newBase.size = CGSize(width: (rightParts.first!.position.x - parts.first!.position.x) / 2, height: newBase.frame.height)
+            newBase.position = CGPoint(x: parts.first!.position.x + (rightParts.first!.position.x - parts.first!.position.x) / 2, y: part.position.y)
+            for (index, value) in rightBasesByParts.enumerated() {
+                if value.0 == part {
+                    rightBasesByParts[index] = (value.0, newBase)
+                }
+            }
+        }
+        
+        print(rightBasesByParts)
         
         panRecognizer.addTarget(self, action: #selector(GameScene.drag(_:)))
         self.view!.addGestureRecognizer(panRecognizer)
 
         audioManager.delegate = self
         twist()
+        resizeBases()
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -130,7 +164,19 @@ class GameScene: SKScene {
             highlightBase()
         }
         
-        
+//        for (index, value) in BasesByParts.enumerated() {
+//            let partPos = value.0.position
+//            if let base = value.1 {
+//                base.position = partPos
+//            }
+//        }
+//
+//        for (index, value) in rightBasesByParts.enumerated() {
+//            let partPos = value.0.position
+//            if let base = value.1 {
+//                base.position = partPos
+//            }
+//        }
        
     }
     
@@ -359,7 +405,6 @@ class GameScene: SKScene {
         for (index, part) in parts.enumerated() {
             
             let wait = SKAction.wait(forDuration: Double(index) / Double(6))
-//            let move = SKAction.moveTo(x: self.frame.width / 1.6, duration: 1)
             let move2 = SKAction.moveBy(x: rightParts.first!.position.x - part.position.x, y: 0, duration: 1)
             move2.timingMode = .easeInEaseOut
             let reversed = move2.reversed()
@@ -374,7 +419,6 @@ class GameScene: SKScene {
         for (index, part) in rightParts.enumerated() {
             
             let wait = SKAction.wait(forDuration: Double(index) / Double(6))
-            //            let move = SKAction.moveTo(x: self.frame.width / 1.6, duration: 1)
             let move2 = SKAction.moveBy(x: parts.first!.position.x - part.position.x, y: 0, duration: 1)
             move2.timingMode = .easeInEaseOut
             let reversed = move2.reversed()
@@ -387,7 +431,49 @@ class GameScene: SKScene {
         }
     }
     
-    
+    func resizeBases() {
+        
+        for (index, value) in BasesByParts.enumerated() {
+            let wait = SKAction.wait(forDuration: Double(index) / Double(6))
+            if let currentBase = value.1 {
+                let setAnchorLeft = SKAction.run {
+                    currentBase.anchorPoint = CGPoint(x: 0, y: 0.5)
+                }
+                let shrink = SKAction.scaleX(to: 0, duration: 0.5)
+                let setAnchorRight = SKAction.run {
+                    currentBase.anchorPoint = CGPoint(x: 1, y: 0.5)
+                }
+                let grow = SKAction.scaleX(to: 1, duration: 0.5)
+                
+                let sequence = SKAction.sequence([setAnchorRight, shrink, setAnchorLeft, grow, shrink, setAnchorRight, grow])
+//                let reversed = sequence.reversed()
+                let repeatSequence = SKAction.repeatForever(sequence)
+                let finalSequence = SKAction.sequence([wait, repeatSequence])
+                currentBase.run(finalSequence)
+            }
+        }
+        
+        for (index, value) in rightBasesByParts.enumerated() {
+            let wait = SKAction.wait(forDuration: Double(index) / Double(6))
+            if let currentBase = value.1 {
+                let setAnchorLeft = SKAction.run {
+                    currentBase.anchorPoint = CGPoint(x: 0, y: 0.5)
+                }
+                let shrink = SKAction.scaleX(to: 0, duration: 0.5)
+                let setAnchorRight = SKAction.run {
+                    currentBase.anchorPoint = CGPoint(x: 1, y: 0.5)
+                }
+                let grow = SKAction.scaleX(to: 1, duration: 0.5)
+                
+                let sequence = SKAction.sequence([setAnchorLeft, shrink, setAnchorRight, grow, shrink, setAnchorLeft, grow])
+                //                let reversed = sequence.reversed()
+                let repeatSequence = SKAction.repeatForever(sequence)
+                let finalSequence = SKAction.sequence([wait, repeatSequence])
+                currentBase.run(finalSequence)
+            }
+        }
+        
+    }
     
 }
 
