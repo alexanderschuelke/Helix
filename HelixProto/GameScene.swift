@@ -101,6 +101,7 @@ class GameScene: SKScene {
         self.view!.addGestureRecognizer(panRecognizer)
 
         audioManager.delegate = self
+        
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -333,6 +334,53 @@ class GameScene: SKScene {
                 if let base = base {
                     base.alpha = 1
                 }
+            }
+        }
+    }
+    
+    func encodeBases() -> [String] {
+        var resultArray: [String] = []
+        for (index, value) in BasesByParts.enumerated() {
+            if let base = value.1 {
+                if let name = base.name {
+                    resultArray.append(name)
+                }
+            }
+            else {
+                resultArray.append("")
+            }
+        }
+        return resultArray
+    }
+    
+    func decodeBases(data: [String]) {
+        for (index, name) in data.enumerated() {
+            if name == "" {
+                continue
+            }
+            else {
+                var newBase: SKSpriteNode
+                switch name {
+                case "tone1":
+                    newBase = SKSpriteNode(imageNamed: "alt_base1")
+                case "tone2":
+                    newBase = SKSpriteNode(imageNamed: "alt_base2")
+                case "tone3":
+                    newBase = SKSpriteNode(imageNamed: "alt_base3")
+                case "tone4":
+                    newBase = SKSpriteNode(imageNamed: "alt_base4")
+                default:
+                    newBase = SKSpriteNode(imageNamed: "alt_base1")
+                }
+                newBase.name = name
+                addChild(newBase)
+                newBase.anchorPoint = CGPoint(x: 0, y: 0.5)
+                newBase.zPosition = 1
+                
+                newBase.position = CGPoint(x: parts.first!.position.x  + newBase.frame.width / 24, y: parts[index].position.y)
+                basesOnDna.append(newBase)
+                BasesByParts[index] = (BasesByParts[index].0, newBase)
+                
             }
         }
     }
