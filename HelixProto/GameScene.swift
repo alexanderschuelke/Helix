@@ -104,7 +104,7 @@ class GameScene: SKScene {
 
         audioManager.delegate = self
         
-        decodeBases(data: ["", "tone1", "", "", "tone3", "", "", "tone4", "", "", "", ""])
+//        decodeBases(data: ["", "tone1", "", "", "tone3", "", "", "tone4", "", "", "", ""])
         
     }
     
@@ -167,11 +167,11 @@ class GameScene: SKScene {
                         let snap = SKAction.move(to: newPosition, duration: 0.1)
                         currentBase.run(snap)
                         basesOnDna.append(currentBase)
-                        gameSceneDelegate?.triggerSendData()
                         for (index, tuple) in BasesByParts.enumerated() {
                             if tuple.0 == nearest {
                                 cleanOldParts(from: currentBase)
                                 BasesByParts[index] = (nearest, currentBase)
+                                gameSceneDelegate?.triggerSendData()
                             }
                         }
                         // Get next base of same type
