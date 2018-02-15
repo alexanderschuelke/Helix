@@ -12,15 +12,14 @@ import GameplayKit
 import MultipeerConnectivity
 
 class GameViewController: UIViewController, UINavigationControllerDelegate, MCBrowserViewControllerDelegate, MCSessionDelegate, GameDelegate {
-    
     @IBAction func connectivityButton(_ sender: Any) {
         showConnectionPrompt()
     }
-    @IBOutlet weak var playButton: UIBarButtonItem!
     
-    @IBAction func doStuff(_ sender: Any) {
+    @IBAction func sendButton(_ sender: Any) {
         sendSequence()
     }
+   
     var peerID: MCPeerID!
     var mcSession: MCSession!
     var mcAdvertiserAssistant: MCAdvertiserAssistant!
