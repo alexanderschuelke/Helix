@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0755DDFC20362EA2009A2B79 /* GameDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0755DDFB20362EA2009A2B79 /* GameDelegate.swift */; };
 		077FCA542030D11900C2B174 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077FCA532030D11900C2B174 /* AppDelegate.swift */; };
 		077FCA5A2030D11900C2B174 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077FCA592030D11900C2B174 /* GameScene.swift */; };
 		077FCA5C2030D11900C2B174 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077FCA5B2030D11900C2B174 /* GameViewController.swift */; };
@@ -65,6 +66,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0755DDFB20362EA2009A2B79 /* GameDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameDelegate.swift; sourceTree = "<group>"; };
 		077FCA502030D11900C2B174 /* HelixProto.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HelixProto.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		077FCA532030D11900C2B174 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		077FCA592030D11900C2B174 /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
@@ -183,6 +185,7 @@
 		07C101DA203355C3008776D7 /* Protocols */ = {
 			isa = PBXGroup;
 			children = (
+				0755DDFB20362EA2009A2B79 /* GameDelegate.swift */,
 				07C101D820335496008776D7 /* AudioManagerDelegate.swift */,
 			);
 			path = Protocols;
@@ -367,6 +370,7 @@
 			files = (
 				07C101D920335496008776D7 /* AudioManagerDelegate.swift in Sources */,
 				07C101D720335167008776D7 /* AudioManager.swift in Sources */,
+				0755DDFC20362EA2009A2B79 /* GameDelegate.swift in Sources */,
 				077FCA5A2030D11900C2B174 /* GameScene.swift in Sources */,
 				077FCA5C2030D11900C2B174 /* GameViewController.swift in Sources */,
 				077FCA542030D11900C2B174 /* AppDelegate.swift in Sources */,

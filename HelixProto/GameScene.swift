@@ -12,6 +12,8 @@ import AudioKit
 
 class GameScene: SKScene {
     
+    var gameSceneDelegate: GameDelegate?
+    
     private var background = SKSpriteNode(imageNamed: "alt_background")
     // The parts represent the individual pieces of the DNA. Each part can hold a tone.
     private var parts: [SKSpriteNode] = []
@@ -102,6 +104,8 @@ class GameScene: SKScene {
 
         audioManager.delegate = self
         
+        decodeBases(data: ["", "tone1", "", "", "tone3", "", "", "tone4", "", "", "", ""])
+        
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -163,6 +167,7 @@ class GameScene: SKScene {
                         let snap = SKAction.move(to: newPosition, duration: 0.1)
                         currentBase.run(snap)
                         basesOnDna.append(currentBase)
+                        gameSceneDelegate?.triggerSendData()
                         for (index, tuple) in BasesByParts.enumerated() {
                             if tuple.0 == nearest {
                                 cleanOldParts(from: currentBase)
@@ -355,7 +360,7 @@ class GameScene: SKScene {
     
     func decodeBases(data: [String]) {
         for (index, name) in data.enumerated() {
-            if name == "" {
+            if name == "" || !isPartEmpty(BasesByParts[index].0) {
                 continue
             }
             else {
@@ -376,6 +381,7 @@ class GameScene: SKScene {
                 addChild(newBase)
                 newBase.anchorPoint = CGPoint(x: 0, y: 0.5)
                 newBase.zPosition = 1
+                let s = "S"
                 
                 newBase.position = CGPoint(x: parts.first!.position.x  + newBase.frame.width / 24, y: parts[index].position.y)
                 basesOnDna.append(newBase)
