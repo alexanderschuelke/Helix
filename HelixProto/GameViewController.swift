@@ -12,13 +12,26 @@ import GameplayKit
 import MultipeerConnectivity
 
 class GameViewController: UIViewController, UINavigationControllerDelegate, MCBrowserViewControllerDelegate, MCSessionDelegate, GameDelegate {
+    
     @IBAction func connectivityButton(_ sender: Any) {
         showConnectionPrompt()
     }
     
-    @IBAction func sendButton(_ sender: Any) {
-        sendSequence()
+    
+    @IBAction func increaseTempo(_ sender: Any) {
+        scene!.audioManager.tempo += 15
+        scene?.audioManager.sequencer.setTempo(scene!.audioManager.tempo)
+        tempoLabel.title = String(describing: scene!.audioManager.tempo)
     }
+    
+    @IBAction func decreaseTempo(_ sender: Any) {
+        scene!.audioManager.tempo -= 15
+        scene?.audioManager.sequencer.setTempo(scene!.audioManager.tempo)
+        tempoLabel.title = String(describing: scene!.audioManager.tempo)
+    }
+    
+    @IBOutlet weak var tempoLabel: UIBarButtonItem!
+    
    
     var peerID: MCPeerID!
     var mcSession: MCSession!
@@ -74,7 +87,9 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
             scene.scaleMode = .aspectFill
             skView.presentScene(scene)
             scene.gameSceneDelegate = self
+            tempoLabel.title = String(scene.audioManager.tempo)
         }
+        
         
         
         //This is the PeerID we need for the session

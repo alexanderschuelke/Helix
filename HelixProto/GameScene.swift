@@ -24,7 +24,7 @@ class GameScene: SKScene {
     // All DNA parts are listed here with according bases
     private var BasesByParts: [(SKSpriteNode, SKSpriteNode?)] = []
     
-    private let audioManager = AudioManager()
+    public let audioManager = AudioManager()
     
     // For dragging bases
     private let panRecognizer = UIPanGestureRecognizer()
