@@ -38,7 +38,7 @@ class GameScene: SKScene {
     
     override init(size: CGSize) {
         // Create the one side of the DNA string.
-        for index in 0...11 {
+        for _ in 0...audioManager.bars*4 {
             let part = SKSpriteNode(imageNamed: "alt_stridepart")
             part.zPosition = 0
             part.anchorPoint = CGPoint(x: 0.5, y: 0.5)
@@ -76,7 +76,8 @@ class GameScene: SKScene {
         // Build the dna string, part by part
         for (index, part) in parts.enumerated() {
             addChild(part)
-            part.position = CGPoint(x: self.frame.size.width / 2.8, y: self.frame.size.height - part.frame.size.height * CGFloat(index))
+            part.position = CGPoint(x: self.frame.size.width / 2.8,
+                                    y: self.frame.size.height - part.frame.size.height * CGFloat(index) - part.size.height / 2 + 5)
             
         }
         
@@ -87,7 +88,8 @@ class GameScene: SKScene {
             base.zPosition = 1
             base.name = "tone\(index+1)"
             let overallHeight = base.frame.size.height * CGFloat(bases.count)
-            base.position = CGPoint(x: self.frame.size.width / 1.68, y: (self.frame.size.height / 2) + (overallHeight / 2) - (base.frame.size.height * 2 * CGFloat(index)))
+            base.position = CGPoint(x: self.frame.size.width / 1.68,
+                                    y: (self.frame.size.height / 2) + (overallHeight / 2) - (base.frame.size.height * 2 * CGFloat(index)))
         }
         
         let playButton = SKSpriteNode(imageNamed: "playButton")
@@ -104,8 +106,6 @@ class GameScene: SKScene {
 
         audioManager.delegate = self
         
-//        decodeBases(data: ["", "tone1", "", "", "tone3", "", "", "tone4", "", "", "", ""])
-        
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -117,7 +117,7 @@ class GameScene: SKScene {
             currentSequencerPosition = newSequencerPosition
             audioManager.updateLoop()
             print(newSequencerPosition)
-            highlightBase()
+//            highlightBase()
         }
        
     }
@@ -322,26 +322,26 @@ class GameScene: SKScene {
         }
     }
     
-    func highlightBase() {
-        
-        var newSequencerPosition = Int(audioManager.sequencer.currentRelativePosition.beats)
-
-        
-        let currentPart = parts[newSequencerPosition]
-
-        for (part, base) in BasesByParts {
-            if part == currentPart {
-                if let base = base {
-                    base.alpha = 0.7
-                }
-            }
-            else {
-                if let base = base {
-                    base.alpha = 1
-                }
-            }
-        }
-    }
+//    func highlightBase() {
+//
+//        var newSequencerPosition = Int(audioManager.sequencer.currentRelativePosition.beats)
+//
+//
+//        let currentPart = parts[newSequencerPosition]
+//
+//        for (part, base) in BasesByParts {
+//            if part == currentPart {
+//                if let base = base {
+//                    base.alpha = 0.7
+//                }
+//            }
+//            else {
+//                if let base = base {
+//                    base.alpha = 1
+//                }
+//            }
+//        }
+//    }
     
     func encodeBases() -> [String] {
         var resultArray: [String] = []
@@ -389,6 +389,10 @@ class GameScene: SKScene {
                 
             }
         }
+    }
+    
+    func clearBases() {
+//        for index in BasesByParts
     }
     
 }

@@ -130,8 +130,6 @@
 		077FCA472030D11900C2B174 = {
 			isa = PBXGroup;
 			children = (
-				07EDF3A42030D34C002DFD90 /* AudioKitUI.framework */,
-				07EDF3A02030D33F002DFD90 /* AudioKit.framework */,
 				077FCA522030D11900C2B174 /* HelixProto */,
 				077FCA6D2030D11900C2B174 /* HelixProtoTests */,
 				077FCA782030D11900C2B174 /* HelixProtoUITests */,
@@ -230,6 +228,8 @@
 		B9838E412036E93700EE5032 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				07EDF3A42030D34C002DFD90 /* AudioKitUI.framework */,
+				07EDF3A02030D33F002DFD90 /* AudioKit.framework */,
 				B9838E422036E93700EE5032 /* AudioToolbox.framework */,
 			);
 			name = Frameworks;
