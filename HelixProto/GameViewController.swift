@@ -49,12 +49,13 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
             scene.scaleMode = .aspectFill
             skView.presentScene(scene)
             scene.gameSceneDelegate = self
+            
             tempoLabel.title = String(scene.audioManager.tempo)
+            tempoStepper.value = scene.audioManager.tempo
         }
         
         tempoStepper.autorepeat = true
         tempoStepper.stepValue = 5
-        tempoStepper.value = (scene?.audioManager.tempo)!
         tempoStepper.maximumValue = 400
         tempoStepper.minimumValue = 5
         
@@ -121,9 +122,9 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
     
     
     //possibly allows automatically asking to connect nearby users?
-    func browserViewController(_ browserViewController: MCBrowserViewController, shouldPresentNearbyPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) -> Bool {
-        return false
-    }
+//    func browserViewController(_ browserViewController: MCBrowserViewController, shouldPresentNearbyPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) -> Bool {
+//        return false
+//    }
     
     func browserViewControllerDidFinish(_ browserViewController: MCBrowserViewController) {
         dismiss(animated: true)

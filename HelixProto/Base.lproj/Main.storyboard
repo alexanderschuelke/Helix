@@ -36,7 +36,7 @@
                         <nil key="title"/>
                         <leftBarButtonItems>
                             <barButtonItem id="39i-Gy-0Qt">
-                                <stepper key="customView" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" maximumValue="100" id="yfh-SI-9rp">
+                                <stepper key="customView" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="200" maximumValue="200" id="yfh-SI-9rp">
                                     <rect key="frame" x="16" y="7.5" width="94" height="29"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
