@@ -14,7 +14,9 @@ class GameScene: SKScene {
     
     var gameSceneDelegate: GameDelegate?
     
-    private var background = SKSpriteNode(imageNamed: "alt_background")
+    public let audioManager = AudioManager()
+
+
     // The parts represent the individual pieces of the DNA. Each part can hold a tone.
     private var parts: [SKSpriteNode] = []
     // The bases that are available for the user on the right of the screen
@@ -24,8 +26,9 @@ class GameScene: SKScene {
     // All DNA parts are listed here with according bases
     private var BasesByParts: [(SKSpriteNode, SKSpriteNode?)] = []
     
-    public let audioManager = AudioManager()
-    
+    private var background = SKSpriteNode(imageNamed: "alt_background")
+
+
     // For dragging bases
     private let panRecognizer = UIPanGestureRecognizer()
     // Currently moved base
@@ -38,7 +41,7 @@ class GameScene: SKScene {
     
     override init(size: CGSize) {
         // Create the one side of the DNA string.
-        for _ in 0...audioManager.bars*4 {
+        for _ in 0...audioManager.bars*4-1 {
             let part = SKSpriteNode(imageNamed: "alt_stridepart")
             part.zPosition = 0
             part.anchorPoint = CGPoint(x: 0.5, y: 0.5)
@@ -77,7 +80,7 @@ class GameScene: SKScene {
         for (index, part) in parts.enumerated() {
             addChild(part)
             part.position = CGPoint(x: self.frame.size.width / 2.8,
-                                    y: self.frame.size.height - part.frame.size.height * CGFloat(index) - part.size.height / 2 + 5)
+                                    y: self.frame.size.height - part.frame.size.height * CGFloat(index) - part.size.height / 2 )
             
         }
         

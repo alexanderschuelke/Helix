@@ -21,18 +21,12 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
     
     @IBOutlet weak var tempoStepper: UIStepper!
     
+    @IBAction func tempoChange(_ sender: Any) {
+        scene?.audioManager.tempo = tempoStepper.value
+        scene?.audioManager.sequencer.setTempo(scene!.audioManager.tempo)
+        tempoLabel.title = String(describing: scene!.audioManager.tempo)
+    }
     
-//    @IBAction func increaseTempo(_ sender: Any) {
-//        scene!.audioManager.tempo += 15
-//        scene?.audioManager.sequencer.setTempo(scene!.audioManager.tempo)
-//        tempoLabel.title = String(describing: scene!.audioManager.tempo)
-//    }
-//
-//    @IBAction func decreaseTempo(_ sender: Any) {
-//        scene!.audioManager.tempo -= 15
-//        scene?.audioManager.sequencer.setTempo(scene!.audioManager.tempo)
-//        tempoLabel.title = String(describing: scene!.audioManager.tempo)
-//    }
     
     @IBOutlet weak var tempoLabel: UIBarButtonItem!
     
@@ -42,35 +36,6 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
     var mcAdvertiserAssistant: MCAdvertiserAssistant!
     
     var scene: GameScene?
-    
-    func sendSequence() {
-        if mcSession.connectedPeers.count > 0 {
-            let newData = NSKeyedArchiver.archivedData(withRootObject: scene?.encodeBases())
-            do {
-                try mcSession.send(newData, toPeers: mcSession.connectedPeers, with: .reliable)
-            } catch let error as NSError {
-                let ac = UIAlertController(title: "Send error", message: error.localizedDescription, preferredStyle: .alert)
-                ac.addAction(UIAlertAction(title: "OK", style: .default))
-                present(ac, animated: true)
-            }
-        }
-    }
-    
-
-    //possibly allows automatically asking to connect nearby users?
-    func browserViewController(_ browserViewController: MCBrowserViewController, shouldPresentNearbyPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) -> Bool {
-        return false
-    }
-    
-    func browserViewControllerDidFinish(_ browserViewController: MCBrowserViewController) {
-        dismiss(animated: true)
-    }
-    
-    func browserViewControllerWasCancelled(_ browserViewController: MCBrowserViewController) {
-        dismiss(animated: true)
-    }
-    
-    
     
     
     override func viewDidLoad() {
@@ -87,7 +52,11 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
             tempoLabel.title = String(scene.audioManager.tempo)
         }
         
-        
+        tempoStepper.autorepeat = true
+        tempoStepper.stepValue = 5
+        tempoStepper.value = (scene?.audioManager.tempo)!
+        tempoStepper.maximumValue = 400
+        tempoStepper.minimumValue = 5
         
         //This is the PeerID we need for the session
         peerID = MCPeerID(displayName: UIDevice.current.name)
@@ -98,6 +67,19 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
         //We are declaring a delegate
         mcSession.delegate = self
         
+    }
+    
+    func sendSequence() {
+        if mcSession.connectedPeers.count > 0 {
+            let newData = NSKeyedArchiver.archivedData(withRootObject: scene!.encodeBases())
+            do {
+                try mcSession.send(newData, toPeers: mcSession.connectedPeers, with: .reliable)
+            } catch let error as NSError {
+                let ac = UIAlertController(title: "Send error", message: error.localizedDescription, preferredStyle: .alert)
+                ac.addAction(UIAlertAction(title: "OK", style: .default))
+                present(ac, animated: true)
+            }
+        }
     }
     
     
@@ -136,6 +118,21 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
         mcBrowser.delegate = self
         present(mcBrowser, animated: true)
     }
+    
+    
+    //possibly allows automatically asking to connect nearby users?
+    func browserViewController(_ browserViewController: MCBrowserViewController, shouldPresentNearbyPeer peerID: MCPeerID, withDiscoveryInfo info: [String : String]?) -> Bool {
+        return false
+    }
+    
+    func browserViewControllerDidFinish(_ browserViewController: MCBrowserViewController) {
+        dismiss(animated: true)
+    }
+    
+    func browserViewControllerWasCancelled(_ browserViewController: MCBrowserViewController) {
+        dismiss(animated: true)
+    }
+    
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

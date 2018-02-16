@@ -19,12 +19,17 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <skView contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pjN-za-9rZ">
+                            <skView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pjN-za-9rZ">
                                 <rect key="frame" x="0.0" y="64" width="375" height="603"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </skView>
                         </subviews>
                         <color key="backgroundColor" red="0.36915922159999998" green="0.2190480232" blue="0.51767444610000002" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                        <constraints>
+                            <constraint firstItem="pjN-za-9rZ" firstAttribute="bottom" secondItem="4qk-I5-YsI" secondAttribute="bottom" id="JRg-jV-16j"/>
+                            <constraint firstItem="pjN-za-9rZ" firstAttribute="trailing" secondItem="4qk-I5-YsI" secondAttribute="trailing" id="KLC-R6-9OE"/>
+                            <constraint firstItem="pjN-za-9rZ" firstAttribute="top" secondItem="4qk-I5-YsI" secondAttribute="top" id="h7t-6i-mPn"/>
+                            <constraint firstItem="pjN-za-9rZ" firstAttribute="leading" secondItem="4qk-I5-YsI" secondAttribute="leading" id="pVI-zG-U1H"/>
+                        </constraints>
                         <viewLayoutGuide key="safeArea" id="4qk-I5-YsI"/>
                     </view>
                     <navigationItem key="navigationItem" id="VHe-oF-H0h">
@@ -34,6 +39,10 @@
                                 <stepper key="customView" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" maximumValue="100" id="yfh-SI-9rp">
                                     <rect key="frame" x="16" y="7.5" width="94" height="29"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <connections>
+                                        <action selector="tempoChange:" destination="BV1-FR-VrT" eventType="valueChanged" id="GPY-wg-P3f"/>
+                                    </connections>
                                 </stepper>
                                 <connections>
                                     <action selector="stepper:" destination="BV1-FR-VrT" id="V5w-VB-vsm"/>
