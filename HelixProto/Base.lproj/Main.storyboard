@@ -24,22 +24,21 @@
                     <navigationItem key="navigationItem" id="VHe-oF-H0h">
                         <nil key="title"/>
                         <leftBarButtonItems>
-                            <barButtonItem title="-" id="dN9-bL-RDi">
+                            <barButtonItem style="plain" id="39i-Gy-0Qt">
+                                <stepper key="customView" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" maximumValue="100" id="yfh-SI-9rp">
+                                    <rect key="frame" x="16" y="7.5" width="94" height="29"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                </stepper>
                                 <connections>
-                                    <action selector="decreaseTempo:" destination="BV1-FR-VrT" id="x6K-cL-MBl"/>
+                                    <action selector="stepper:" destination="BV1-FR-VrT" id="V5w-VB-vsm"/>
                                 </connections>
                             </barButtonItem>
                             <barButtonItem title="Item" id="ian-lo-SLL">
                                 <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </barButtonItem>
-                            <barButtonItem title="+" id="jjQ-DZ-2ld">
-                                <connections>
-                                    <action selector="increaseTempo:" destination="BV1-FR-VrT" id="RPb-1k-Uus"/>
-                                </connections>
-                            </barButtonItem>
                         </leftBarButtonItems>
                         <segmentedControl key="titleView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="0xv-qU-zVw">
-                            <rect key="frame" x="100" y="7" width="185" height="30"/>
+                            <rect key="frame" x="161" y="7" width="162" height="30"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <color key="backgroundColor" red="0.36915922164916992" green="0.21904802322387695" blue="0.51767444610595703" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                             <segments>
@@ -58,6 +57,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="tempoLabel" destination="ian-lo-SLL" id="NUW-aS-JBy"/>
+                        <outlet property="tempoStepper" destination="yfh-SI-9rp" id="EEG-ze-J2m"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SZV-WD-TEh" sceneMemberID="firstResponder"/>

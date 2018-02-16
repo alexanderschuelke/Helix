@@ -31,6 +31,7 @@
 		07EDF3A92030D3DA002DFD90 /* 4tracks.mid in Resources */ = {isa = PBXBuildFile; fileRef = 07EDF3A82030D3DA002DFD90 /* 4tracks.mid */; };
 		07EDF3AE2030D3F2002DFD90 /* Bell.wav in Resources */ = {isa = PBXBuildFile; fileRef = 07EDF3AC2030D3F2002DFD90 /* Bell.wav */; };
 		07EDF3B02030D51D002DFD90 /* FM Piano.wav in Resources */ = {isa = PBXBuildFile; fileRef = 07EDF3AF2030D51D002DFD90 /* FM Piano.wav */; };
+		B9838E432036E93700EE5032 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B9838E422036E93700EE5032 /* AudioToolbox.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -94,6 +95,8 @@
 		07EDF3A82030D3DA002DFD90 /* 4tracks.mid */ = {isa = PBXFileReference; lastKnownFileType = audio.midi; path = 4tracks.mid; sourceTree = "<group>"; };
 		07EDF3AC2030D3F2002DFD90 /* Bell.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = Bell.wav; sourceTree = "<group>"; };
 		07EDF3AF2030D51D002DFD90 /* FM Piano.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "FM Piano.wav"; sourceTree = "<group>"; };
+		B9838E402036E93600EE5032 /* HelixProto.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = HelixProto.entitlements; sourceTree = "<group>"; };
+		B9838E422036E93700EE5032 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,6 +106,7 @@
 			files = (
 				07EDF3A52030D34C002DFD90 /* AudioKitUI.framework in Frameworks */,
 				07EDF3A12030D33F002DFD90 /* AudioKit.framework in Frameworks */,
+				B9838E432036E93700EE5032 /* AudioToolbox.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -132,6 +136,7 @@
 				077FCA6D2030D11900C2B174 /* HelixProtoTests */,
 				077FCA782030D11900C2B174 /* HelixProtoUITests */,
 				077FCA512030D11900C2B174 /* Products */,
+				B9838E412036E93700EE5032 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -148,6 +153,7 @@
 		077FCA522030D11900C2B174 /* HelixProto */ = {
 			isa = PBXGroup;
 			children = (
+				B9838E402036E93600EE5032 /* HelixProto.entitlements */,
 				07C101DB203355D1008776D7 /* Extensions */,
 				07C101DA203355C3008776D7 /* Protocols */,
 				07EDF3A72030D3B9002DFD90 /* Resources */,
@@ -219,6 +225,14 @@
 				07C101E0203378CB008776D7 /* cheeb-hat.wav */,
 			);
 			path = Samples;
+			sourceTree = "<group>";
+		};
+		B9838E412036E93700EE5032 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B9838E422036E93700EE5032 /* AudioToolbox.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -293,6 +307,9 @@
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+							com.apple.InterAppAudio = {
 								enabled = 1;
 							};
 						};
@@ -541,6 +558,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = HelixProto/HelixProto.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = CSKA8928CG;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -560,6 +578,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = HelixProto/HelixProto.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = CSKA8928CG;
 				FRAMEWORK_SEARCH_PATHS = (

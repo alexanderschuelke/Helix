@@ -17,18 +17,20 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
         showConnectionPrompt()
     }
     
+    @IBOutlet weak var tempoStepper: UIStepper!
     
-    @IBAction func increaseTempo(_ sender: Any) {
-        scene!.audioManager.tempo += 15
-        scene?.audioManager.sequencer.setTempo(scene!.audioManager.tempo)
-        tempoLabel.title = String(describing: scene!.audioManager.tempo)
-    }
     
-    @IBAction func decreaseTempo(_ sender: Any) {
-        scene!.audioManager.tempo -= 15
-        scene?.audioManager.sequencer.setTempo(scene!.audioManager.tempo)
-        tempoLabel.title = String(describing: scene!.audioManager.tempo)
-    }
+//    @IBAction func increaseTempo(_ sender: Any) {
+//        scene!.audioManager.tempo += 15
+//        scene?.audioManager.sequencer.setTempo(scene!.audioManager.tempo)
+//        tempoLabel.title = String(describing: scene!.audioManager.tempo)
+//    }
+//
+//    @IBAction func decreaseTempo(_ sender: Any) {
+//        scene!.audioManager.tempo -= 15
+//        scene?.audioManager.sequencer.setTempo(scene!.audioManager.tempo)
+//        tempoLabel.title = String(describing: scene!.audioManager.tempo)
+//    }
     
     @IBOutlet weak var tempoLabel: UIBarButtonItem!
     
