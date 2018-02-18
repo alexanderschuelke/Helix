@@ -30,6 +30,7 @@ class GameScene: SKScene {
     private let panRecognizer = UIPanGestureRecognizer()
     // Currently moved base
     private var currentBase: SKSpriteNode?
+    private var currentPart: SKSpriteNode?
     private var originalBasePosition: CGPoint?
 
     private var selectionFrame: SelectionFrame?
@@ -129,6 +130,13 @@ class GameScene: SKScene {
         if gestureRecognizer.state == .began || gestureRecognizer.state == .changed {
             
             let translation = gestureRecognizer.translation(in: self.view)
+            
+            if let currentPart = currentPart {
+                for part in parts {
+                    part.position = CGPoint(x: part.position.x, y: part.position.y - translation.y*2)
+                }
+                gestureRecognizer.setTranslation(CGPoint.zero, in: self.view)
+            }
             
             guard let currentBase = currentBase else {
                 return
@@ -238,6 +246,11 @@ class GameScene: SKScene {
             let nodes = self.nodes(at: location)
             if nodes.first is SKSpriteNode {
                 let node = nodes.first as! SKSpriteNode
+                if parts.contains(node) {
+                    currentPart = node
+                } else {
+                    currentPart = nil
+                }
                 if let name = node.name {
                     if name == "playButton" {
                         node.playPressedAnimation()
