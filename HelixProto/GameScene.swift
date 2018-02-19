@@ -12,6 +12,11 @@ import AudioKit
 
 class GameScene: SKScene {
     
+    enum side {
+        case left
+        case right
+    }
+    
     var gameSceneDelegate: GameDelegate?
     
     private var background = SKSpriteNode(imageNamed: "alt_background")
@@ -24,6 +29,14 @@ class GameScene: SKScene {
     // All DNA parts are listed here with according bases
     private var BasesByParts: [(SKSpriteNode, SKSpriteNode?)] = []
     
+    private var rightParts: [SKSpriteNode] = []
+    private var rightBases: [Int:SKSpriteNode] = [:]
+    private var rightBasesByParts: [(SKSpriteNode, SKSpriteNode?)] = []
+    
+    private var leftParts: [SKSpriteNode] = []
+    private var leftBases: [Int:SKSpriteNode] = [:]
+    private var leftBasesByParts: [(SKSpriteNode, SKSpriteNode?)] = []
+    
     private let audioManager = AudioManager()
     
     // For dragging bases
@@ -31,11 +44,13 @@ class GameScene: SKScene {
     // Currently moved base
     private var currentBase: SKSpriteNode?
     private var currentPart: SKSpriteNode?
+    private var scrolling: Bool = false
     private var originalBasePosition: CGPoint?
 
     private var selectionFrame: SelectionFrame?
-    
+    private var playButton: SKSpriteNode = SKSpriteNode(imageNamed: "playButton")
     private var currentSequencerPosition = -1
+    private var currentSide: side = side.left
     
     override init(size: CGSize) {
         // Create the one side of the DNA string.
@@ -43,16 +58,27 @@ class GameScene: SKScene {
             let part = SKSpriteNode(imageNamed: "alt_stridepart")
             part.zPosition = 0
             part.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-            parts.append(part)
-            BasesByParts.append((part, nil))
+            leftParts.append(part)
+            leftBasesByParts.append((part, nil))
+            
+            let rightPart = SKSpriteNode(imageNamed: "alt_stridepart")
+            rightPart.zPosition = 0
+            rightPart.xScale = -1
+            rightPart.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+            rightParts.append(rightPart)
+            rightBasesByParts.append((rightPart, nil))
         }
         
         // Create the 4 bases available for the user
-        bases[0] = SKSpriteNode(imageNamed: "alt_base1")
-        bases[1] = SKSpriteNode(imageNamed: "alt_base2")
-        bases[2] = SKSpriteNode(imageNamed: "alt_base3")
-        bases[3] = SKSpriteNode(imageNamed: "alt_base4")
+        leftBases[0] = SKSpriteNode(imageNamed: "alt_base1")
+        leftBases[1] = SKSpriteNode(imageNamed: "alt_base2")
+        leftBases[2] = SKSpriteNode(imageNamed: "alt_base3")
+        leftBases[3] = SKSpriteNode(imageNamed: "alt_base4")
 
+        rightBases[0] = SKSpriteNode(imageNamed: "alt_base1")
+        rightBases[1] = SKSpriteNode(imageNamed: "alt_base2")
+        rightBases[2] = SKSpriteNode(imageNamed: "alt_base3")
+        rightBases[3] = SKSpriteNode(imageNamed: "alt_base4")
         
         super.init(size: size)
     }
@@ -70,28 +96,24 @@ class GameScene: SKScene {
         addChild(background)
         
         // Manage background
+        background.name = "background"
         background.anchorPoint = CGPoint(x: 0.5, y: 0.5) // default
         background.position = CGPoint(x: size.width/2, y: size.height/2)
         background.size = self.frame.size
         
-        // Build the dna string, part by part
-        for (index, part) in parts.enumerated() {
-            addChild(part)
-            part.position = CGPoint(x: self.frame.size.width / 2.8, y: self.frame.size.height - part.frame.size.height * CGFloat(index))
-            
-        }
+        buildParts(side: .right)
+        buildBases(side: .right)
         
-        // Position the 4 bases
-        for (index, base) in bases {
-            addChild(base)
-            base.anchorPoint = CGPoint(x: 0, y: 0.5)
-            base.zPosition = 1
-            base.name = "tone\(index+1)"
-            let overallHeight = base.frame.size.height * CGFloat(bases.count)
-            base.position = CGPoint(x: self.frame.size.width / 1.68, y: (self.frame.size.height / 2) + (overallHeight / 2) - (base.frame.size.height * 2 * CGFloat(index)))
-        }
+//        // Position the 4 bases
+//        for (index, base) in bases {
+//            addChild(base)
+//            base.anchorPoint = CGPoint(x: 0, y: 0.5)
+//            base.zPosition = 1
+//            base.name = "tone\(index+1)"
+//            let overallHeight = base.frame.size.height * CGFloat(bases.count)
+//            base.position = CGPoint(x: self.frame.size.width / 1.68, y: (self.frame.size.height / 2) + (overallHeight / 2) - (base.frame.size.height * 2 * CGFloat(index)))
+//        }
         
-        let playButton = SKSpriteNode(imageNamed: "playButton")
         playButton.name = "playButton"
         addChild(playButton)
         playButton.zPosition = 99
@@ -104,8 +126,50 @@ class GameScene: SKScene {
         self.view!.addGestureRecognizer(panRecognizer)
 
         audioManager.delegate = self
-        
+        changeSide(to: .left)
 //        decodeBases(data: ["", "tone1", "", "", "tone3", "", "", "tone4", "", "", "", ""])
+        
+    }
+    
+    func buildParts(side: side) {
+        switch side {
+        case .left:
+            for (index, part) in parts.enumerated() {
+                addChild(part)
+                part.position = CGPoint(x: self.frame.size.width / 2.8, y: self.frame.size.height - part.frame.size.height * CGFloat(index))
+            }
+        case .right:
+            for (index, part) in parts.enumerated() {
+                addChild(part)
+                part.position = CGPoint(x: self.frame.size.width / 1.6, y: self.frame.size.height - part.frame.size.height * CGFloat(index))
+            }
+        }
+    }
+    
+    func buildBases(side: side) {
+        switch side {
+        case .left:
+            for (index, base) in bases {
+                addChild(base)
+                base.anchorPoint = CGPoint(x: 0, y: 0.5)
+                base.zPosition = 1
+                base.name = "tone\(index+1)"
+                let overallHeight = base.frame.size.height * CGFloat(bases.count)
+                base.position = CGPoint(x: self.frame.size.width / 1.68, y: (self.frame.size.height / 2) + (overallHeight / 2) - (base.frame.size.height * 2 * CGFloat(index)))
+            }
+        case .right:
+            for (index, base) in bases {
+                addChild(base)
+                base.anchorPoint = CGPoint(x: 0, y: 0.5)
+                base.zPosition = 1
+                base.name = "tone\(index+1)"
+                let overallHeight = base.frame.size.height * CGFloat(rightBases.count)
+                base.position = CGPoint(x: self.frame.size.width / 3.88, y: (self.frame.size.height / 2) + (overallHeight / 2) - (base.frame.size.height * 2 * CGFloat(index)))
+            }
+        }
+    }
+    
+    func addToScene() {
         
     }
     
@@ -117,7 +181,6 @@ class GameScene: SKScene {
         if currentSequencerPosition != newSequencerPosition && audioManager.sequencer.isPlaying {
             currentSequencerPosition = newSequencerPosition
             audioManager.updateLoop()
-            print(newSequencerPosition)
             highlightBase()
         }
        
@@ -130,10 +193,24 @@ class GameScene: SKScene {
         if gestureRecognizer.state == .began || gestureRecognizer.state == .changed {
             
             let translation = gestureRecognizer.translation(in: self.view)
-            
-            if let currentPart = currentPart {
-                for part in parts {
+            print(convertPoint(toView: parts.last!.position))
+            if scrolling {
+                for part in parts.reversed() {
                     part.position = CGPoint(x: part.position.x, y: part.position.y - translation.y*2)
+                    if part == parts.last! {
+                        if intersects(part) {
+                            let newPart = SKSpriteNode(imageNamed: "alt_stridepart")
+                            newPart.zPosition = 0
+                            newPart.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+                            parts.append(newPart)
+                            BasesByParts.append((newPart, nil))
+                            addChild(newPart)
+                            newPart.position = CGPoint(x: self.frame.size.width / 2.8, y: part.position.y - part.frame.height)
+                        }
+                    }
+                }
+                for base in basesOnDna {
+                    base.position = CGPoint(x: base.position.x, y: base.position.y - translation.y * 2)
                 }
                 gestureRecognizer.setTranslation(CGPoint.zero, in: self.view)
             }
@@ -164,6 +241,7 @@ class GameScene: SKScene {
         }
             // End of drag, decide wether to snap to the stride or return to original position
         else if gestureRecognizer.state == .ended {
+
             if let currentBase = currentBase {
                 if checkIfDeleted(currentBase) {
                     return
@@ -171,7 +249,14 @@ class GameScene: SKScene {
                 if let nearest = getNearestPart() {
                     // Only assign base to position if base is near enough and part doesn't hold a base yet
                     if isPartEmpty(nearest){
-                        let newPosition = CGPoint(x: nearest.position.x + currentBase.frame.width / 24, y: nearest.position.y)
+                        var newPosition = CGPoint.zero
+                        if currentSide == .left {
+                            newPosition = CGPoint(x: nearest.position.x + currentBase.frame.width / 24, y: nearest.position.y)
+                        }
+                        else {
+                            currentBase.anchorPoint = CGPoint(x: 1, y: 0.5)
+                            newPosition = CGPoint(x: nearest.position.x - (currentBase.frame.width / 24), y: nearest.position.y)
+                        }
                         let snap = SKAction.move(to: newPosition, duration: 0.1)
                         currentBase.run(snap)
                         basesOnDna.append(currentBase)
@@ -194,6 +279,24 @@ class GameScene: SKScene {
                     let snapBack = SKAction.move(to: originalBasePosition, duration: 0.3)
                     currentBase.run(snapBack)
                 }
+            }
+        }
+        else if gestureRecognizer.state == .cancelled || gestureRecognizer.state == .failed {
+            if let currentPart = currentPart {
+                for part in parts.reversed() {
+                    if part == parts.last! {
+                        if intersects(part) {
+                            let newPart = SKSpriteNode(imageNamed: "alt_stridepart")
+                            newPart.zPosition = 0
+                            newPart.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+                            parts.append(newPart)
+                            BasesByParts.append((newPart, nil))
+                            addChild(newPart)
+                            newPart.position = CGPoint(x: self.frame.size.width / 2.8, y: part.position.y - part.frame.height)
+                        }
+                    }
+                }
+                gestureRecognizer.setTranslation(CGPoint.zero, in: self.view)
             }
         }
     }
@@ -219,21 +322,42 @@ class GameScene: SKScene {
     }
     
     func checkIfDeleted(_ base: SKSpriteNode) -> Bool{
-        let oldAnchorPoint = base.anchorPoint
-        base.anchorPoint = CGPoint(x: 0, y: base.anchorPoint.y)
-        let leftMostPoint = base.position
-        base.anchorPoint = oldAnchorPoint
-        if (leftMostPoint.x < parts.first!.position.x - parts.first!.frame.size.width * 2) {
-            cleanOldParts(from: base)
-            basesOnDna.remove(at: basesOnDna.index(of: base)!)
-            let leaveScreen = SKAction.moveTo(x: base.position.x - base.frame.size.width * 2, duration: 0.5)
-            let remove = SKAction.run {
-                base.removeFromParent()
+
+        if currentSide == .left {
+            let oldAnchorPoint = base.anchorPoint
+            base.anchorPoint = CGPoint(x: 0, y: base.anchorPoint.y)
+            let leftMostPoint = base.position
+            base.anchorPoint = oldAnchorPoint
+            if (leftMostPoint.x < parts.first!.position.x - parts.first!.frame.size.width * 2 && basesOnDna.contains(base)) {
+                cleanOldParts(from: base)
+                basesOnDna.remove(at: basesOnDna.index(of: base)!)
+                let leaveScreen = SKAction.moveTo(x: base.position.x - base.frame.size.width * 2, duration: 0.5)
+                let remove = SKAction.run {
+                    base.removeFromParent()
+                }
+                let sequence = SKAction.sequence([leaveScreen, remove])
+                base.run(sequence)
+                reloadSample(for: base)
+                return true
             }
-            let sequence = SKAction.sequence([leaveScreen, remove])
-            base.run(sequence)
-            reloadSample(for: base)
-            return true
+        }
+        else {
+            let oldAnchorPoint = base.anchorPoint
+            base.anchorPoint = CGPoint(x: 1, y: base.anchorPoint.y)
+            let rightMostPoint = base.position
+            base.anchorPoint = oldAnchorPoint
+            if (rightMostPoint.x > parts.first!.position.x + parts.first!.frame.size.width * 2 && basesOnDna.contains(base)) {
+                cleanOldParts(from: base)
+                basesOnDna.remove(at: basesOnDna.index(of: base)!)
+                let leaveScreen = SKAction.moveTo(x: self.frame.width, duration: 0.5)
+                let remove = SKAction.run {
+                    base.removeFromParent()
+                }
+                let sequence = SKAction.sequence([leaveScreen, remove])
+                base.run(sequence)
+                reloadSample(for: base)
+                return true
+            }
         }
         return false
     }
@@ -247,9 +371,8 @@ class GameScene: SKScene {
             if nodes.first is SKSpriteNode {
                 let node = nodes.first as! SKSpriteNode
                 if parts.contains(node) {
-                    currentPart = node
-                } else {
-                    currentPart = nil
+                    scrolling = true
+                    return
                 }
                 if let name = node.name {
                     if name == "playButton" {
@@ -263,6 +386,11 @@ class GameScene: SKScene {
                         node.name = "playButton"
                         audioManager.stop()
                     }
+                    else if name == "background" || parts.contains(node){
+                        currentBase = nil
+                        scrolling = true
+                        return
+                    }
                 }
                 if bases.values.contains(node) || basesOnDna.contains(node){
                     if let name = node.name {
@@ -273,6 +401,7 @@ class GameScene: SKScene {
                 } else {
                     currentBase = nil
                 }
+                scrolling = false
             } else {
                 currentBase = nil
             }
@@ -320,9 +449,16 @@ class GameScene: SKScene {
             newBase.anchorPoint = CGPoint(x: 0, y: 0.5)
             newBase.zPosition = 1
             let overallHeight = newBase.frame.size.height * CGFloat(bases.count)
-            newBase.position = CGPoint(x: self.frame.size.width, y: (self.frame.size.height / 2) + (overallHeight / 2) - (newBase.frame.size.height * 2 * CGFloat(position)))
-            let finalPos = CGPoint(x: self.frame.size.width / 1.68, y: (self.frame.size.height / 2) + (overallHeight / 2) - (newBase.frame.size.height * 2 * CGFloat(position)))
-            
+            var finalPos: CGPoint
+            if currentSide == .left {
+                newBase.position = CGPoint(x: self.frame.size.width, y: (self.frame.size.height / 2) + (overallHeight / 2) - (newBase.frame.size.height * 2 * CGFloat(position)))
+                finalPos = CGPoint(x: self.frame.size.width / 1.68, y: (self.frame.size.height / 2) + (overallHeight / 2) - (newBase.frame.size.height * 2 * CGFloat(position)))
+            }
+            else {
+                newBase.position = CGPoint(x: self.frame.minX, y: (self.frame.size.height / 2) + (overallHeight / 2) - (newBase.frame.size.height * 2 * CGFloat(position)))
+                finalPos = CGPoint(x: self.frame.size.width / 3.88, y: (self.frame.size.height / 2) + (overallHeight / 2) - (newBase.frame.size.height * 2 * CGFloat(position)))
+            }
+
             let appear = SKAction.move(to: finalPos, duration: 0.5)
             newBase.run(appear)
         }
@@ -394,13 +530,36 @@ class GameScene: SKScene {
                 addChild(newBase)
                 newBase.anchorPoint = CGPoint(x: 0, y: 0.5)
                 newBase.zPosition = 1
-                let s = "S"
+
                 
                 newBase.position = CGPoint(x: parts.first!.position.x  + newBase.frame.width / 24, y: parts[index].position.y)
                 basesOnDna.append(newBase)
                 BasesByParts[index] = (BasesByParts[index].0, newBase)
                 
             }
+        }
+    }
+    
+    public func changeSide(to side: side) {
+
+        self.removeAllChildren()
+        self.addChild(background)
+        self.addChild(self.playButton)
+        switch side {
+        case .left:
+            currentSide = .left
+            parts = leftParts
+            bases = leftBases
+            BasesByParts = leftBasesByParts
+            buildParts(side: .left)
+            buildBases(side: .left)
+        case .right:
+            currentSide = .right
+            parts = rightParts
+            bases = rightBases
+            BasesByParts = rightBasesByParts
+            buildParts(side: .right)
+            buildBases(side: .right)
         }
     }
     

@@ -12,6 +12,21 @@ import GameplayKit
 import MultipeerConnectivity
 
 class GameViewController: UIViewController, UINavigationControllerDelegate, MCBrowserViewControllerDelegate, MCSessionDelegate, GameDelegate {
+    
+    @IBOutlet weak var segmentedControl: UISegmentedControl!
+    
+    @IBAction func indexChanged(_ sender: Any) {
+        switch segmentedControl.selectedSegmentIndex {
+        case 0:
+            scene!.changeSide(to: .left)
+        case 1:
+            return
+        case 2: scene!.changeSide(to: .right)
+        default:
+            return
+        }
+    }
+    
     @IBAction func connectivityButton(_ sender: Any) {
         showConnectionPrompt()
     }
