@@ -54,6 +54,7 @@ class GameScene: SKScene {
     private var currentSide: side = side.left
     private var opener = true
     private var blockScrolling = false
+    private var maxTopPosition: CGFloat = 0
     
     override init(size: CGSize) {
         // Create the one side of the DNA string.
@@ -140,13 +141,23 @@ class GameScene: SKScene {
         switch side {
         case .left:
             for (index, part) in parts.enumerated() {
+                if index == 0 {
+                    part.position = CGPoint(x: self.frame.size.width / 2.8, y: self.frame.size.height - part.frame.size.height * 3)
+                    maxTopPosition = part.position.y
+                } else {
+
+                    part.position = CGPoint(x: self.frame.size.width / 2.8, y: parts[index-1].position.y - part.frame.size.height * 1.5)
+                }
                 addChild(part)
-                part.position = CGPoint(x: self.frame.size.width / 2.8, y: self.frame.size.height - part.frame.size.height * 1.5 * CGFloat(index))
             }
         case .right:
             for (index, part) in parts.enumerated() {
+                if index == 0 {
+                    part.position = CGPoint(x: self.frame.size.width / 1.6, y: self.frame.size.height - part.frame.size.height * 3)
+                } else {
+                    part.position = CGPoint(x: self.frame.size.width / 1.6, y: parts[index-1].position.y - part.frame.size.height * 1.5)
+                }
                 addChild(part)
-                part.position = CGPoint(x: self.frame.size.width / 1.6, y: self.frame.size.height - part.frame.size.height * 1.5 * CGFloat(index))
             }
         }
     }
@@ -223,6 +234,10 @@ class GameScene: SKScene {
 
             if scrolling {
                 if !blockScrolling {
+                    print("\(parts.first!.position.y) \(maxTopPosition)")
+                    if parts.first!.position.y > maxTopPosition && translation.y < 0{
+                        return
+                    }
                 for part in parts.reversed() {
                     part.position = CGPoint(x: part.position.x, y: part.position.y - translation.y*2)
                     if part == parts.last! {
@@ -895,7 +910,12 @@ class GameScene: SKScene {
             for (index, part) in rightParts.enumerated() {
                 addChild(part)
                 let wait = SKAction.wait(forDuration: 0.4)
-                part.position = CGPoint(x: self.frame.width, y: self.frame.height - part.frame.height * 1.5 * CGFloat(index))
+                if index == 0 {
+                    part.position = CGPoint(x: self.frame.width, y: self.frame.height - part.frame.height * 3)
+                } else {
+                    part.position = CGPoint(x: self.frame.width, y: rightParts[index-1].position.y - part.frame.size.height * 1.5)
+                }
+
                 let finalPosition = self.frame.size.width / 1.6
                 let moveTo = SKAction.moveTo(x: finalPosition, duration: 0.5)
                 let sequence = SKAction.sequence([wait, moveTo])
@@ -942,7 +962,11 @@ class GameScene: SKScene {
             for (index, part) in leftParts.enumerated() {
                 addChild(part)
                 let wait = SKAction.wait(forDuration: 0.4)
-                part.position = CGPoint(x: 0, y: self.frame.height - part.frame.height * 1.5 * CGFloat(index))
+                if index == 0 {
+                    part.position = CGPoint(x: 0, y: self.frame.height - part.frame.height * 3)
+                } else {
+                    part.position = CGPoint(x: 0, y: leftParts[index-1].position.y - part.frame.size.height * 1.5)
+                }
                 let finalPosition = self.frame.size.width / 2.8
                 let moveTo = SKAction.moveTo(x: finalPosition, duration: 0.5)
                 let sequence = SKAction.sequence([wait, moveTo])
