@@ -13,5 +13,10 @@ protocol AudioManagerDelegate {
     
     func getBasesByParts() -> [(SKSpriteNode, SKSpriteNode?)]
     func getPassiveBasesByParts() -> [(SKSpriteNode, SKSpriteNode?)]
+    func getLeftBasesByParts() -> [(SKSpriteNode, SKSpriteNode?)]
+    func getRightBasesByParts() -> [(SKSpriteNode, SKSpriteNode?)]
     func getParts() -> [SKSpriteNode]
+    func getleftParts() -> [SKSpriteNode]
+    func getRightParts() -> [SKSpriteNode]
+    func getCurrentSide() -> GameScene.side
 }

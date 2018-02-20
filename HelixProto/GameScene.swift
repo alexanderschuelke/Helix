@@ -299,7 +299,7 @@ class GameScene: SKScene {
                             if tuple.0 == nearest {
                                 cleanOldParts(from: currentBase)
                                 BasesByParts[index] = (nearest, currentBase)
-                                audioManager.beatsAmount = audioManager.checkBeatAmount()
+                                audioManager.beatsAmount = audioManager.checkBeatAmount(basesByParts: BasesByParts, parts: parts)
                                 showBars()
                                 gameSceneDelegate?.triggerSendData()
                             }
@@ -349,7 +349,6 @@ class GameScene: SKScene {
     func isPartEmpty(_ part: SKSpriteNode) -> Bool {
         for (index, _) in BasesByParts.enumerated() {
             if part == BasesByParts[index].0 && BasesByParts[index].1 == nil {
-                print("yayyy")
                 return true
             }
         }
@@ -648,7 +647,7 @@ class GameScene: SKScene {
             buildParts(side: .left)
             buildBases(side: .left)
             restorePositions(side: .left)
-            audioManager.beatsAmount = audioManager.checkBeatAmount()
+            audioManager.beatsAmount = audioManager.checkBeatAmount(basesByParts: BasesByParts, parts: parts)
             showBars()
         case .right:
             currentSide = .right
@@ -659,7 +658,7 @@ class GameScene: SKScene {
             buildParts(side: .right)
             buildBases(side: .right)
             restorePositions(side: .right)
-            audioManager.beatsAmount = audioManager.checkBeatAmount()
+            audioManager.beatsAmount = audioManager.checkBeatAmount(basesByParts: BasesByParts, parts: parts)
             showBars()
         }
         gameSceneDelegate?.triggerSendData()
@@ -686,6 +685,7 @@ class GameScene: SKScene {
                     tonename = name
                 }
                 var newBase = SKSpriteNode(imageNamed: spriteName)
+                basesOnDna.remove(at: basesOnDna.index(of: base)!)
                 basesOnDna.append(newBase)
                 newBase.name = tonename
                 addChild(newBase)
@@ -998,8 +998,28 @@ extension GameScene : AudioManagerDelegate {
         return passiveBasesByParts
     }
     
+    public func getLeftBasesByParts() -> [(SKSpriteNode, SKSpriteNode?)] {
+        return leftBasesByParts
+    }
+    
+    public func getRightBasesByParts() -> [(SKSpriteNode, SKSpriteNode?)] {
+        return rightBasesByParts
+    }
+    
     public func getParts() -> [SKSpriteNode] {
         return parts
+    }
+    
+    public func getleftParts() -> [SKSpriteNode] {
+        return leftParts
+    }
+    
+    public func getRightParts() -> [SKSpriteNode] {
+        return rightParts
+    }
+    
+    public func getCurrentSide() -> GameScene.side {
+        return currentSide
     }
 }
 

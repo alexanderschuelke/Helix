@@ -8,7 +8,7 @@
 
 import Foundation
 import AudioKit
-
+import SpriteKit
 class AudioManager {
     
     public var delegate: AudioManagerDelegate?
@@ -44,7 +44,7 @@ class AudioManager {
         }
         
         // Bundle samplers to one audio output
-        let mixer = AKMixer(sampler1, sampler2, sampler3, sampler4)
+        let mixer = AKMixer(sampler1, sampler2, sampler3, sampler4, sampler5, sampler6, sampler7, sampler8)
         AudioKit.output = mixer
         
         // Basic setup
@@ -92,9 +92,19 @@ class AudioManager {
             return
         }
         
-        guard let passiveBasesByParts = delegate?.getPassiveBasesByParts() else {
-            return
+        var passiveBasesByParts: [(SKSpriteNode, SKSpriteNode?)] = []
+        let currentSide = delegate?.getCurrentSide()
+        if currentSide == GameScene.side.left {
+            if let array = delegate?.getRightBasesByParts() {
+                passiveBasesByParts = array
+            }
         }
+        else {
+            if let array = delegate?.getLeftBasesByParts() {
+                passiveBasesByParts = array
+            }
+        }
+
         
         guard let parts = delegate?.getParts() else {
             return
@@ -107,8 +117,21 @@ class AudioManager {
         
 
         
-        beatsAmount = checkBeatAmount()
-        sequencer.setLength(AKDuration(beats: beatsAmount))
+        let beatsAmountCurrent = checkBeatAmount(basesByParts: basesByParts, parts: parts)
+        var passiveParts: [SKSpriteNode] = []
+        if currentSide == GameScene.side.left {
+            if let array = delegate?.getRightParts() {
+                passiveParts = array
+            }
+        }
+        else {
+            if let array = delegate?.getleftParts() {
+                passiveParts = array
+            }
+        }
+        let beatsAmountPassive = checkBeatAmount(basesByParts: passiveBasesByParts, parts: passiveParts)
+        let finalBeatAmount = beatsAmountCurrent > beatsAmountPassive ? beatsAmountCurrent : beatsAmountPassive
+        sequencer.setLength(AKDuration(beats: finalBeatAmount))
         sequencer.enableLooping()
         
         // Remove all previous sampler events, so old tones ar enot played
@@ -134,31 +157,26 @@ class AudioManager {
             }
             index = index + 1
         }
-        
-//        for (_, base) in passiveBasesByParts {
-//            if let base = base {
-//                if base.name == "tone1" {
-//                    sequencer.tracks[4].add(noteNumber: 62, velocity: 127, position: AKDuration(beats: Double(index)), duration: AKDuration(beats: 12 - index))
-//                } else if base.name == "tone2" {
-//                    sequencer.tracks[5].add(noteNumber: 60, velocity: 127, position: AKDuration(beats: Double(index)), duration: AKDuration(beats: 12 - index))
-//                } else if base.name == "tone3" {
-//                    sequencer.tracks[6].add(noteNumber: 58, velocity: 127, position: AKDuration(beats: Double(index)), duration: AKDuration(beats: 12 - index))
-//                } else if base.name == "tone4" {
-//                    sequencer.tracks[7].add(noteNumber: 56, velocity: 127, position: AKDuration(beats: Double(index)), duration: AKDuration(beats: 12 - index))
-//                }
-//            }
-//            index = index + 1
-//        }
+
+        var index2 = 0
+        for (_, base) in passiveBasesByParts {
+            if let base = base {
+                if base.name == "tone1" {
+                    sequencer.tracks[4].add(noteNumber: 62, velocity: 127, position: AKDuration(beats: Double(index2)), duration: AKDuration(beats: beatsAmount - index2))
+                } else if base.name == "tone2" {
+                    sequencer.tracks[5].add(noteNumber: 60, velocity: 127, position: AKDuration(beats: Double(index2)), duration: AKDuration(beats: beatsAmount - index2))
+                } else if base.name == "tone3" {
+                    sequencer.tracks[6].add(noteNumber: 58, velocity: 127, position: AKDuration(beats: Double(index2)), duration: AKDuration(beats: beatsAmount - index2))
+                } else if base.name == "tone4" {
+                    sequencer.tracks[7].add(noteNumber: 56, velocity: 127, position: AKDuration(beats: Double(index2)), duration: AKDuration(beats: beatsAmount - index2))
+                }
+            }
+            index2 = index2 + 1
+        }
     }
     
-    public func checkBeatAmount() -> Double {
-        
-        guard let basesByParts = delegate?.getBasesByParts() else {
-            return 0.0
-        }
-        guard let parts = delegate?.getParts() else {
-            return 0.0
-        }
+    public func checkBeatAmount(basesByParts: [(SKSpriteNode, SKSpriteNode?)], parts: [SKSpriteNode]) -> Double {
+
         
         var highestPosition = 0
         for (currentPart, base) in basesByParts {
