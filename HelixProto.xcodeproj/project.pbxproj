@@ -17,6 +17,12 @@
 		077FCA6F2030D11900C2B174 /* HelixProtoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077FCA6E2030D11900C2B174 /* HelixProtoTests.swift */; };
 		077FCA7A2030D11900C2B174 /* HelixProtoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077FCA792030D11900C2B174 /* HelixProtoUITests.swift */; };
 		077FCA882030D14700C2B174 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077FCA872030D14700C2B174 /* Extensions.swift */; };
+		07A0410A203B91240066945A /* jose_kick.wav in Resources */ = {isa = PBXBuildFile; fileRef = 07A04109203B91240066945A /* jose_kick.wav */; };
+		07A0410C203B94C10066945A /* jose_coffee.wav in Resources */ = {isa = PBXBuildFile; fileRef = 07A0410B203B94C10066945A /* jose_coffee.wav */; };
+		07A0410E203B95110066945A /* jose_lowkick.wav in Resources */ = {isa = PBXBuildFile; fileRef = 07A0410D203B95110066945A /* jose_lowkick.wav */; };
+		07A04110203B95410066945A /* jose_high.wav in Resources */ = {isa = PBXBuildFile; fileRef = 07A0410F203B95410066945A /* jose_high.wav */; };
+		07A04112203B959C0066945A /* jose_mid.wav in Resources */ = {isa = PBXBuildFile; fileRef = 07A04111203B959C0066945A /* jose_mid.wav */; };
+		07A04114203B96020066945A /* jose_clap.wav in Resources */ = {isa = PBXBuildFile; fileRef = 07A04113203B96010066945A /* jose_clap.wav */; };
 		07C101D52031E9C0008776D7 /* SelectionFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C101D42031E9C0008776D7 /* SelectionFrame.swift */; };
 		07C101D720335167008776D7 /* AudioManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C101D620335167008776D7 /* AudioManager.swift */; };
 		07C101D920335496008776D7 /* AudioManagerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07C101D820335496008776D7 /* AudioManagerDelegate.swift */; };
@@ -82,6 +88,12 @@
 		077FCA792030D11900C2B174 /* HelixProtoUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelixProtoUITests.swift; sourceTree = "<group>"; };
 		077FCA7B2030D11900C2B174 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		077FCA872030D14700C2B174 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		07A04109203B91240066945A /* jose_kick.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = jose_kick.wav; sourceTree = "<group>"; };
+		07A0410B203B94C10066945A /* jose_coffee.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = jose_coffee.wav; sourceTree = "<group>"; };
+		07A0410D203B95110066945A /* jose_lowkick.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = jose_lowkick.wav; sourceTree = "<group>"; };
+		07A0410F203B95410066945A /* jose_high.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = jose_high.wav; sourceTree = "<group>"; };
+		07A04111203B959C0066945A /* jose_mid.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = jose_mid.wav; sourceTree = "<group>"; };
+		07A04113203B96010066945A /* jose_clap.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = jose_clap.wav; sourceTree = "<group>"; };
 		07C101D42031E9C0008776D7 /* SelectionFrame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionFrame.swift; sourceTree = "<group>"; };
 		07C101D620335167008776D7 /* AudioManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioManager.swift; sourceTree = "<group>"; };
 		07C101D820335496008776D7 /* AudioManagerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioManagerDelegate.swift; sourceTree = "<group>"; };
@@ -213,6 +225,12 @@
 			children = (
 				07EDF3AF2030D51D002DFD90 /* FM Piano.wav */,
 				07EDF3AC2030D3F2002DFD90 /* Bell.wav */,
+				07A04109203B91240066945A /* jose_kick.wav */,
+				07A0410F203B95410066945A /* jose_high.wav */,
+				07A0410B203B94C10066945A /* jose_coffee.wav */,
+				07A04113203B96010066945A /* jose_clap.wav */,
+				07A04111203B959C0066945A /* jose_mid.wav */,
+				07A0410D203B95110066945A /* jose_lowkick.wav */,
 				07C101DE203378C5008776D7 /* cheeb-ch.wav */,
 				07C101DC203378B4008776D7 /* cheeb-bd.wav */,
 				07C101E2203378D1008776D7 /* cheeb-snr.wav */,
@@ -337,9 +355,15 @@
 				07C101E1203378CB008776D7 /* cheeb-hat.wav in Resources */,
 				07EDF3AE2030D3F2002DFD90 /* Bell.wav in Resources */,
 				07C101E3203378D1008776D7 /* cheeb-snr.wav in Resources */,
+				07A0410C203B94C10066945A /* jose_coffee.wav in Resources */,
+				07A0410E203B95110066945A /* jose_lowkick.wav in Resources */,
+				07A0410A203B91240066945A /* jose_kick.wav in Resources */,
 				07EDF3B02030D51D002DFD90 /* FM Piano.wav in Resources */,
 				077FCA5F2030D11900C2B174 /* Main.storyboard in Resources */,
 				077FCA612030D11900C2B174 /* Assets.xcassets in Resources */,
+				07A04114203B96020066945A /* jose_clap.wav in Resources */,
+				07A04112203B959C0066945A /* jose_mid.wav in Resources */,
+				07A04110203B95410066945A /* jose_high.wav in Resources */,
 				077FCA642030D11900C2B174 /* LaunchScreen.storyboard in Resources */,
 				07C101DD203378B4008776D7 /* cheeb-bd.wav in Resources */,
 				07EDF3A92030D3DA002DFD90 /* 4tracks.mid in Resources */,

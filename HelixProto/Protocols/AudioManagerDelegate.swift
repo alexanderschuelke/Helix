@@ -12,5 +12,6 @@ import SpriteKit
 protocol AudioManagerDelegate {
     
     func getBasesByParts() -> [(SKSpriteNode, SKSpriteNode?)]
-    
+    func getPassiveBasesByParts() -> [(SKSpriteNode, SKSpriteNode?)]
+    func getParts() -> [SKSpriteNode]
 }

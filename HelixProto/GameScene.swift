@@ -28,6 +28,7 @@ class GameScene: SKScene {
     private var basesOnDna: [SKSpriteNode] = []
     // All DNA parts are listed here with according bases
     private var BasesByParts: [(SKSpriteNode, SKSpriteNode?)] = []
+    private var passiveBasesByParts: [(SKSpriteNode, SKSpriteNode?)] = []
     
     private var rightParts: [SKSpriteNode] = []
     private var rightBases: [Int:SKSpriteNode] = [:]
@@ -55,14 +56,14 @@ class GameScene: SKScene {
     override init(size: CGSize) {
         // Create the one side of the DNA string.
         for index in 0...11 {
-            let part = SKSpriteNode(imageNamed: "alt_stridepart")
-            part.zPosition = 0
+            let part = SKSpriteNode(imageNamed: "circle_orange")
+            part.zPosition = 3
             part.anchorPoint = CGPoint(x: 0.5, y: 0.5)
             leftParts.append(part)
             leftBasesByParts.append((part, nil))
             
-            let rightPart = SKSpriteNode(imageNamed: "alt_stridepart")
-            rightPart.zPosition = 0
+            let rightPart = SKSpriteNode(imageNamed: "circle_orange")
+            rightPart.zPosition = 3
             rightPart.xScale = -1
             rightPart.anchorPoint = CGPoint(x: 0.5, y: 0.5)
             rightParts.append(rightPart)
@@ -70,15 +71,15 @@ class GameScene: SKScene {
         }
         
         // Create the 4 bases available for the user
-        leftBases[0] = SKSpriteNode(imageNamed: "alt_base1")
-        leftBases[1] = SKSpriteNode(imageNamed: "alt_base2")
-        leftBases[2] = SKSpriteNode(imageNamed: "alt_base3")
-        leftBases[3] = SKSpriteNode(imageNamed: "alt_base4")
+        leftBases[0] = SKSpriteNode(imageNamed: "square_stride_pink")
+        leftBases[1] = SKSpriteNode(imageNamed: "square_stride_orange")
+        leftBases[2] = SKSpriteNode(imageNamed: "square_stride_light")
+        leftBases[3] = SKSpriteNode(imageNamed: "square_stride_white")
 
-        rightBases[0] = SKSpriteNode(imageNamed: "alt_base1")
-        rightBases[1] = SKSpriteNode(imageNamed: "alt_base2")
-        rightBases[2] = SKSpriteNode(imageNamed: "alt_base3")
-        rightBases[3] = SKSpriteNode(imageNamed: "alt_base4")
+        rightBases[0] = SKSpriteNode(imageNamed: "square_stride_pink")
+        rightBases[1] = SKSpriteNode(imageNamed: "square_stride_orange")
+        rightBases[2] = SKSpriteNode(imageNamed: "square_stride_light")
+        rightBases[3] = SKSpriteNode(imageNamed: "square_stride_white")
         
         super.init(size: size)
     }
@@ -127,6 +128,7 @@ class GameScene: SKScene {
 
         audioManager.delegate = self
         changeSide(to: .left)
+        showBars()
 //        decodeBases(data: ["", "tone1", "", "", "tone3", "", "", "tone4", "", "", "", ""])
         
     }
@@ -136,12 +138,12 @@ class GameScene: SKScene {
         case .left:
             for (index, part) in parts.enumerated() {
                 addChild(part)
-                part.position = CGPoint(x: self.frame.size.width / 2.8, y: self.frame.size.height - part.frame.size.height * CGFloat(index))
+                part.position = CGPoint(x: self.frame.size.width / 2.8, y: self.frame.size.height - part.frame.size.height * 1.5 * CGFloat(index))
             }
         case .right:
             for (index, part) in parts.enumerated() {
                 addChild(part)
-                part.position = CGPoint(x: self.frame.size.width / 1.6, y: self.frame.size.height - part.frame.size.height * CGFloat(index))
+                part.position = CGPoint(x: self.frame.size.width / 1.6, y: self.frame.size.height - part.frame.size.height * 1.5 * CGFloat(index))
             }
         }
     }
@@ -155,7 +157,7 @@ class GameScene: SKScene {
                 base.zPosition = 1
                 base.name = "tone\(index+1)"
                 let overallHeight = base.frame.size.height * CGFloat(bases.count)
-                base.position = CGPoint(x: self.frame.size.width / 1.68, y: (self.frame.size.height / 2) + (overallHeight / 2) - (base.frame.size.height * 2 * CGFloat(index)))
+                base.position = CGPoint(x: self.frame.size.width / 1.68, y: (self.frame.size.height / 2) + (overallHeight / 2) - (base.frame.size.height * 3 * CGFloat(index)))
             }
         case .right:
             for (index, base) in bases {
@@ -164,7 +166,7 @@ class GameScene: SKScene {
                 base.zPosition = 1
                 base.name = "tone\(index+1)"
                 let overallHeight = base.frame.size.height * CGFloat(rightBases.count)
-                base.position = CGPoint(x: self.frame.size.width / 3.88, y: (self.frame.size.height / 2) + (overallHeight / 2) - (base.frame.size.height * 2 * CGFloat(index)))
+                base.position = CGPoint(x: self.frame.size.width / 3.88, y: (self.frame.size.height / 2) + (overallHeight / 2) - (base.frame.size.height * 3 * CGFloat(index)))
             }
         }
     }
@@ -176,12 +178,14 @@ class GameScene: SKScene {
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
         
-        let newSequencerPosition = Int(audioManager.sequencer.currentRelativePosition.beats)
+        let newSequencerPosition = audioManager.sequencer.currentRelativePosition.beats.isNaN ? 1 : Int(audioManager.sequencer.currentRelativePosition.beats)
+        
 
         if currentSequencerPosition != newSequencerPosition && audioManager.sequencer.isPlaying {
             currentSequencerPosition = newSequencerPosition
             audioManager.updateLoop()
             highlightBase()
+            showBars()
         }
        
     }
@@ -193,19 +197,25 @@ class GameScene: SKScene {
         if gestureRecognizer.state == .began || gestureRecognizer.state == .changed {
             
             let translation = gestureRecognizer.translation(in: self.view)
-            print(convertPoint(toView: parts.last!.position))
+
             if scrolling {
                 for part in parts.reversed() {
                     part.position = CGPoint(x: part.position.x, y: part.position.y - translation.y*2)
                     if part == parts.last! {
                         if intersects(part) {
-                            let newPart = SKSpriteNode(imageNamed: "alt_stridepart")
-                            newPart.zPosition = 0
+                            let newPart = SKSpriteNode(imageNamed: "circle_orange")
+                            newPart.zPosition = 3
                             newPart.anchorPoint = CGPoint(x: 0.5, y: 0.5)
                             parts.append(newPart)
                             BasesByParts.append((newPart, nil))
                             addChild(newPart)
-                            newPart.position = CGPoint(x: self.frame.size.width / 2.8, y: part.position.y - part.frame.height)
+                            if currentSide == .left {
+                                newPart.position = CGPoint(x: self.frame.size.width / 2.8, y: part.position.y - part.frame.height * 1.5)
+                            } else {
+                                newPart.xScale = -1
+                                newPart.position = CGPoint(x: self.frame.size.width / 1.6, y: part.position.y - part.frame.height * 1.5)
+                            }
+
                         }
                     }
                 }
@@ -286,13 +296,13 @@ class GameScene: SKScene {
                 for part in parts.reversed() {
                     if part == parts.last! {
                         if intersects(part) {
-                            let newPart = SKSpriteNode(imageNamed: "alt_stridepart")
-                            newPart.zPosition = 0
+                            let newPart = SKSpriteNode(imageNamed: "circle_orange")
+                            newPart.zPosition = 3
                             newPart.anchorPoint = CGPoint(x: 0.5, y: 0.5)
                             parts.append(newPart)
                             BasesByParts.append((newPart, nil))
                             addChild(newPart)
-                            newPart.position = CGPoint(x: self.frame.size.width / 2.8, y: part.position.y - part.frame.height)
+                            newPart.position = CGPoint(x: self.frame.size.width / 2.8, y: part.position.y - part.frame.height * 1.5)
                         }
                     }
                 }
@@ -433,15 +443,15 @@ class GameScene: SKScene {
             var newBase: SKSpriteNode
             switch position {
             case 0:
-                newBase = SKSpriteNode(imageNamed: "alt_base1")
+                newBase = SKSpriteNode(imageNamed: "square_stride_pink")
             case 1:
-                newBase = SKSpriteNode(imageNamed: "alt_base2")
+                newBase = SKSpriteNode(imageNamed: "square_stride_orange")
             case 2:
-                newBase = SKSpriteNode(imageNamed: "alt_base3")
+                newBase = SKSpriteNode(imageNamed: "square_stride_light")
             case 3:
-                newBase = SKSpriteNode(imageNamed: "alt_base4")
+                newBase = SKSpriteNode(imageNamed: "square_stride_white")
             default:
-                newBase = SKSpriteNode(imageNamed: "alt_base1")
+                newBase = SKSpriteNode(imageNamed: "square_stride_pink")
             }
             bases[position] = newBase
             newBase.name = "tone\(position+1)"
@@ -451,12 +461,12 @@ class GameScene: SKScene {
             let overallHeight = newBase.frame.size.height * CGFloat(bases.count)
             var finalPos: CGPoint
             if currentSide == .left {
-                newBase.position = CGPoint(x: self.frame.size.width, y: (self.frame.size.height / 2) + (overallHeight / 2) - (newBase.frame.size.height * 2 * CGFloat(position)))
-                finalPos = CGPoint(x: self.frame.size.width / 1.68, y: (self.frame.size.height / 2) + (overallHeight / 2) - (newBase.frame.size.height * 2 * CGFloat(position)))
+                newBase.position = CGPoint(x: self.frame.size.width, y: (self.frame.size.height / 2) + (overallHeight / 2) - (newBase.frame.size.height * 3 * CGFloat(position)))
+                finalPos = CGPoint(x: self.frame.size.width / 1.68, y: (self.frame.size.height / 2) + (overallHeight / 2) - (newBase.frame.size.height * 3 * CGFloat(position)))
             }
             else {
-                newBase.position = CGPoint(x: self.frame.minX, y: (self.frame.size.height / 2) + (overallHeight / 2) - (newBase.frame.size.height * 2 * CGFloat(position)))
-                finalPos = CGPoint(x: self.frame.size.width / 3.88, y: (self.frame.size.height / 2) + (overallHeight / 2) - (newBase.frame.size.height * 2 * CGFloat(position)))
+                newBase.position = CGPoint(x: self.frame.minX, y: (self.frame.size.height / 2) + (overallHeight / 2) - (newBase.frame.size.height * 3 * CGFloat(position)))
+                finalPos = CGPoint(x: self.frame.size.width / 3.88, y: (self.frame.size.height / 2) + (overallHeight / 2) - (newBase.frame.size.height * 3 * CGFloat(position)))
             }
 
             let appear = SKAction.move(to: finalPos, duration: 0.5)
@@ -473,8 +483,7 @@ class GameScene: SKScene {
     
     func highlightBase() {
         
-        var newSequencerPosition = Int(audioManager.sequencer.currentRelativePosition.beats)
-
+        var newSequencerPosition = audioManager.sequencer.currentRelativePosition.beats.isNaN ? 0 :  Int(audioManager.sequencer.currentRelativePosition.beats)
         
         let currentPart = parts[newSequencerPosition]
 
@@ -488,6 +497,20 @@ class GameScene: SKScene {
                 if let base = base {
                     base.alpha = 1
                 }
+            }
+        }
+    }
+    
+    func showBars() {
+      
+        let bars = audioManager.beatsAmount
+
+        for (index, part) in parts.enumerated() {
+            if index+1 > Int(bars) {
+                part.alpha = 0.5
+            }
+            else {
+                part.alpha = 1.0
             }
         }
     }
@@ -516,15 +539,15 @@ class GameScene: SKScene {
                 var newBase: SKSpriteNode
                 switch name {
                 case "tone1":
-                    newBase = SKSpriteNode(imageNamed: "alt_base1")
+                    newBase = SKSpriteNode(imageNamed: "square_stride_pink")
                 case "tone2":
-                    newBase = SKSpriteNode(imageNamed: "alt_base2")
+                    newBase = SKSpriteNode(imageNamed: "square_stride_orange")
                 case "tone3":
-                    newBase = SKSpriteNode(imageNamed: "alt_base3")
+                    newBase = SKSpriteNode(imageNamed: "square_stride_light")
                 case "tone4":
-                    newBase = SKSpriteNode(imageNamed: "alt_base4")
+                    newBase = SKSpriteNode(imageNamed: "square_stride_white")
                 default:
-                    newBase = SKSpriteNode(imageNamed: "alt_base1")
+                    newBase = SKSpriteNode(imageNamed: "square_stride_pink")
                 }
                 newBase.name = name
                 addChild(newBase)
@@ -550,6 +573,7 @@ class GameScene: SKScene {
             currentSide = .left
             parts = leftParts
             bases = leftBases
+            passiveBasesByParts = BasesByParts
             BasesByParts = leftBasesByParts
             buildParts(side: .left)
             buildBases(side: .left)
@@ -557,9 +581,11 @@ class GameScene: SKScene {
             currentSide = .right
             parts = rightParts
             bases = rightBases
+            passiveBasesByParts = BasesByParts
             BasesByParts = rightBasesByParts
             buildParts(side: .right)
             buildBases(side: .right)
+            showBars()
         }
     }
     
@@ -571,5 +597,12 @@ extension GameScene : AudioManagerDelegate {
         return BasesByParts
     }
     
+    public func getPassiveBasesByParts() -> [(SKSpriteNode, SKSpriteNode?)] {
+        return passiveBasesByParts
+    }
+    
+    public func getParts() -> [SKSpriteNode] {
+        return parts
+    }
 }
 
