@@ -15,6 +15,7 @@ class AudioManager {
     public  var sequencer = AKSequencer(filename: "4tracks")
     public var beatsAmount: Double = 4
     // The interfaces to control the wav datas via MIDI
+    public var tempo: Double = 200
     private var sampler1 = AKMIDISampler()
     private var sampler2 = AKMIDISampler()
     private var sampler3 = AKMIDISampler()
@@ -49,7 +50,7 @@ class AudioManager {
         // Basic setup
         sequencer = AKSequencer(filename: "4tracks")
         sequencer.setLength(AKDuration(beats: 4))
-        sequencer.setTempo(200)
+        sequencer.setTempo(tempo)
         sequencer.enableLooping()
         
         // Set the instruments

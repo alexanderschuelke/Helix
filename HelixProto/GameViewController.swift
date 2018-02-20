@@ -12,8 +12,10 @@ import GameplayKit
 import MultipeerConnectivity
 
 class GameViewController: UIViewController, UINavigationControllerDelegate, MCBrowserViewControllerDelegate, MCSessionDelegate, GameDelegate {
-    
+
     @IBOutlet weak var segmentedControl: UISegmentedControl!
+    @IBOutlet weak var tempoLabel: UILabel!
+    @IBOutlet weak var tempoStepper: UIStepper!
     
     @IBAction func indexChanged(_ sender: Any) {
         switch segmentedControl.selectedSegmentIndex {
@@ -35,7 +37,14 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
     @IBAction func sendButton(_ sender: Any) {
         sendSequence()
     }
-   
+
+    @IBAction func changeTempo(_ sender: Any) {
+        scene?.audioManager.tempo = tempoStepper.value
+        scene?.audioManager.sequencer.setTempo(scene!.audioManager.tempo)
+        tempoLabel.text = String(describing: scene!.audioManager.tempo)
+    }
+    
+    
     var peerID: MCPeerID!
     var mcSession: MCSession!
     var mcAdvertiserAssistant: MCAdvertiserAssistant!
@@ -90,8 +99,14 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
             scene.scaleMode = .aspectFill
             skView.presentScene(scene)
             scene.gameSceneDelegate = self
+            tempoLabel.text = String(scene.audioManager.tempo)
+            tempoStepper.value = scene.audioManager.tempo
         }
         
+        tempoStepper.autorepeat = true
+        tempoStepper.stepValue = 5
+        tempoStepper.maximumValue = 400
+        tempoStepper.minimumValue = 5
         
         //This is the PeerID we need for the session
         peerID = MCPeerID(displayName: UIDevice.current.name)

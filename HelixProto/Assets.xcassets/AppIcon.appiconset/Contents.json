@@ -3,13 +3,12 @@
     {
       "size" : "20x20",
       "idiom" : "iphone",
-      "filename" : "Icon-Small@2x.png",
+      "filename" : "Icon-Small-41.png",
       "scale" : "2x"
     },
     {
-      "size" : "20x20",
       "idiom" : "iphone",
-      "filename" : "Icon-Small@3x.png",
+      "size" : "20x20",
       "scale" : "3x"
     },
     {
@@ -61,15 +60,13 @@
       "scale" : "2x"
     },
     {
-      "size" : "29x29",
       "idiom" : "ipad",
-      "filename" : "Icon-Small-41.png",
+      "size" : "29x29",
       "scale" : "1x"
     },
     {
-      "size" : "29x29",
       "idiom" : "ipad",
-      "filename" : "Icon-Small-40@2x-2.png",
+      "size" : "29x29",
       "scale" : "2x"
     },
     {
@@ -105,7 +102,7 @@
     {
       "size" : "1024x1024",
       "idiom" : "ios-marketing",
-      "filename" : "iTunesArtwork.png",
+      "filename" : "iTunesArtwork@2x.png",
       "scale" : "1x"
     }
   ],

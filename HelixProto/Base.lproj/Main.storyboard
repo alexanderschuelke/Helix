@@ -17,7 +17,40 @@
                     <view key="view" multipleTouchEnabled="YES" contentMode="scaleToFill" id="3se-qz-xqx" customClass="SKView">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="hhF-7p-7rt">
+                                <rect key="frame" x="53" y="544.5" width="94" height="63"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wkm-oK-NFU">
+                                        <rect key="frame" x="0.0" y="0.0" width="94" height="29"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="24"/>
+                                        <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <stepper opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" maximumValue="200" translatesAutoresizingMaskIntoConstraints="NO" id="uUO-5I-hyL">
+                                        <rect key="frame" x="0.0" y="34" width="94" height="29"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="94" id="kQv-22-s7o"/>
+                                            <constraint firstAttribute="height" constant="29" id="xaz-RI-nKZ"/>
+                                        </constraints>
+                                        <color key="tintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <connections>
+                                            <action selector="changeTempo:" destination="BV1-FR-VrT" eventType="valueChanged" id="tUq-4W-Cxy"/>
+                                        </connections>
+                                    </stepper>
+                                </subviews>
+                                <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstItem="wkm-oK-NFU" firstAttribute="height" secondItem="uUO-5I-hyL" secondAttribute="height" id="4R5-cn-O4j"/>
+                                    <constraint firstItem="wkm-oK-NFU" firstAttribute="width" secondItem="uUO-5I-hyL" secondAttribute="width" id="xmE-Vh-xwt"/>
+                                </constraints>
+                            </stackView>
+                        </subviews>
                         <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="hhF-7p-7rt" firstAttribute="centerX" secondItem="3se-qz-xqx" secondAttribute="centerX" constant="-87.5" id="9XW-rc-lKj"/>
+                            <constraint firstItem="hhF-7p-7rt" firstAttribute="centerY" secondItem="3se-qz-xqx" secondAttribute="centerY" constant="242.5" id="kdx-c1-yav"/>
+                        </constraints>
                         <viewLayoutGuide key="safeArea" id="4qk-I5-YsI"/>
                     </view>
                     <navigationItem key="navigationItem" id="VHe-oF-H0h">
@@ -50,6 +83,8 @@
                     </navigationItem>
                     <connections>
                         <outlet property="segmentedControl" destination="0xv-qU-zVw" id="Lsf-1q-sCm"/>
+                        <outlet property="tempoLabel" destination="wkm-oK-NFU" id="jLO-Bw-cB2"/>
+                        <outlet property="tempoStepper" destination="uUO-5I-hyL" id="NMG-sZ-09d"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SZV-WD-TEh" sceneMemberID="firstResponder"/>
