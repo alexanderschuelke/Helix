@@ -52,7 +52,7 @@ class GameScene: SKScene {
     private var playButton: SKSpriteNode = SKSpriteNode(imageNamed: "playButton")
     private var currentSequencerPosition = -1
     private var currentSide: side = side.left
-    
+    private var opener = true
     override init(size: CGSize) {
         // Create the one side of the DNA string.
         for index in 0...11 {
@@ -129,6 +129,7 @@ class GameScene: SKScene {
         audioManager.delegate = self
         changeSide(to: .left)
         showBars()
+        opener = false
 //        decodeBases(data: ["", "tone1", "", "", "tone3", "", "", "tone4", "", "", "", ""])
         
     }
@@ -315,6 +316,7 @@ class GameScene: SKScene {
     func isPartEmpty(_ part: SKSpriteNode) -> Bool {
         for (index, _) in BasesByParts.enumerated() {
             if part == BasesByParts[index].0 && BasesByParts[index].1 == nil {
+                print("yayyy")
                 return true
             }
         }
@@ -573,20 +575,92 @@ class GameScene: SKScene {
             currentSide = .left
             parts = leftParts
             bases = leftBases
-            passiveBasesByParts = BasesByParts
+            if !opener {
+                rightBasesByParts = BasesByParts
+            }
             BasesByParts = leftBasesByParts
             buildParts(side: .left)
             buildBases(side: .left)
+            restorePositions(side: .left)
         case .right:
             currentSide = .right
             parts = rightParts
             bases = rightBases
-            passiveBasesByParts = BasesByParts
+            leftBasesByParts = BasesByParts
             BasesByParts = rightBasesByParts
             buildParts(side: .right)
             buildBases(side: .right)
+            restorePositions(side: .right)
             showBars()
         }
+    }
+    
+    public func restorePositions(side: side) {
+        for (index, tuple) in BasesByParts.enumerated() {
+            if let base = tuple.1 {
+                var spriteName = "square_stride_pink"
+                var tonename = "tone1"
+                if let name = base.name {
+                    switch name {
+                        case "tone1":
+                        spriteName = "square_stride_pink"
+                        case "tone2":
+                        spriteName = "square_stride_orange"
+                        case "tone3":
+                        spriteName = "square_stride_light"
+                        case "tone4":
+                        spriteName = "square_stride_white"
+                        default:
+                        spriteName = "square_stride_pink"
+                    }
+                    tonename = name
+                }
+                var newBase = SKSpriteNode(imageNamed: spriteName)
+                basesOnDna.append(newBase)
+                newBase.name = tonename
+                addChild(newBase)
+                newBase.anchorPoint = CGPoint(x: 0, y: 0.5)
+                newBase.zPosition = 1
+
+                BasesByParts[index] = (tuple.0, newBase)
+                if side == .left {
+                    newBase.position = CGPoint(x: tuple.0.position.x + newBase.frame.width / 24, y: tuple.0.position.y)
+                }
+                else {
+                 newBase.anchorPoint = CGPoint(x: 1, y: 0.5)
+                 newBase.position = CGPoint(x: tuple.0.position.x - newBase.frame.width / 24, y: tuple.0.position.y)
+                }
+            }
+        }
+    }
+    
+    public func twist() {
+        removeSelection(side: currentSide)
+        getOtherSide(side: currentSide)
+    }
+    
+    private func removeSelection(side: side) {
+        if side == .left {
+            for base in bases.values {
+                let remove = SKAction.moveTo(x: self.frame.width, duration: 0.3)
+                base.run(remove)
+            }
+        }
+        else {
+            for base in bases.values {
+                let remove = SKAction.moveTo(x: 0, duration: 0.3)
+                base.run(remove)
+            }
+        }
+    }
+    
+    private func getOtherSide(side: side) {
+//        if side == .left {
+//            for base
+//        }
+//        else {
+//
+//        }
     }
     
 }
