@@ -104,36 +104,9 @@ class AudioManager {
             track.clear()
         }
         
-        var highestPosition = 0
-        for (currentPart, base) in basesByParts {
-            if let base = base {
-                for part in parts {
-                    if part == currentPart {
-                        if parts.index(of: currentPart)! > highestPosition-1 {
-                            highestPosition = parts.index(of: currentPart)! + 1
-                        }
-                    }
-                }
-            }
-        }
 
-        var toAdd: Double = 0
-        if highestPosition != 0 {
-            switch highestPosition % 4 {
-            case 0:
-                break
-            case 1:
-                toAdd = 3
-            case 2:
-                toAdd = 2
-            case 3:
-                toAdd = 1
-            default:
-                break
-            }
-        }
         
-        beatsAmount = highestPosition + toAdd < 4 ? 4 : highestPosition + toAdd
+        beatsAmount = checkBeatAmount()
         sequencer.setLength(AKDuration(beats: beatsAmount))
         sequencer.enableLooping()
         
@@ -175,6 +148,47 @@ class AudioManager {
 //            }
 //            index = index + 1
 //        }
+    }
+    
+    public func checkBeatAmount() -> Double {
+        
+        guard let basesByParts = delegate?.getBasesByParts() else {
+            return 0.0
+        }
+        guard let parts = delegate?.getParts() else {
+            return 0.0
+        }
+        
+        var highestPosition = 0
+        for (currentPart, base) in basesByParts {
+            if let base = base {
+                for part in parts {
+                    if part == currentPart {
+                        if parts.index(of: currentPart)! > highestPosition-1 {
+                            highestPosition = parts.index(of: currentPart)! + 1
+                        }
+                    }
+                }
+            }
+        }
+        
+        var toAdd: Double = 0
+        if highestPosition != 0 {
+            switch highestPosition % 4 {
+            case 0:
+                break
+            case 1:
+                toAdd = 3
+            case 2:
+                toAdd = 2
+            case 3:
+                toAdd = 1
+            default:
+                break
+            }
+        }
+        
+        return highestPosition + toAdd < 4 ? 4 : highestPosition + toAdd
     }
     
     public func playSample(baseName: String) {

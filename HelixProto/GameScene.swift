@@ -299,6 +299,8 @@ class GameScene: SKScene {
                             if tuple.0 == nearest {
                                 cleanOldParts(from: currentBase)
                                 BasesByParts[index] = (nearest, currentBase)
+                                audioManager.beatsAmount = audioManager.checkBeatAmount()
+                                showBars()
                                 gameSceneDelegate?.triggerSendData()
                             }
                         }
@@ -646,6 +648,8 @@ class GameScene: SKScene {
             buildParts(side: .left)
             buildBases(side: .left)
             restorePositions(side: .left)
+            audioManager.beatsAmount = audioManager.checkBeatAmount()
+            showBars()
         case .right:
             currentSide = .right
             parts = rightParts
@@ -655,6 +659,7 @@ class GameScene: SKScene {
             buildParts(side: .right)
             buildBases(side: .right)
             restorePositions(side: .right)
+            audioManager.beatsAmount = audioManager.checkBeatAmount()
             showBars()
         }
         gameSceneDelegate?.triggerSendData()
