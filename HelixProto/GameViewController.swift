@@ -21,7 +21,7 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
             scene!.changeSide(to: .left)
         case 1:
             scene!.twist()
-//            scene!.resizeBases()
+            scene!.resizeBases()
         case 2: scene!.changeSide(to: .right)
         default:
             return

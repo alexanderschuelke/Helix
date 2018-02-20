@@ -190,20 +190,24 @@ class GameScene: SKScene {
 
         }
         
-        if audioManager.sequencer.isPlaying {
-            for currentBase in basesOnDna {
-                for (index, value) in rightBasesByParts.enumerated() {
-                    if let base = value.1 {
-                        currentBase.position = value.0.position
-                    }
-                }
-                for (index, value) in leftBasesByParts.enumerated() {
-                    if let base = value.1 {
-                        currentBase.position = value.0.position
-                    }
-                }
-            }
-        }
+//        if audioManager.sequencer.isPlaying {
+//            for currentBase in basesOnDna {
+//                for (index, value) in rightBasesByParts.enumerated() {
+//                    if let base = value.1 {
+//                        if base == currentBase {
+//                            currentBase.position = value.0.position
+//                        }
+//                    }
+//                }
+//                for (index, value) in leftBasesByParts.enumerated() {
+//                    if let base = value.1 {
+//                        if base == currentBase {
+//                            currentBase.position = value.0.position
+//                        }
+//                    }
+//                }
+//            }
+//        }
        
     }
     
@@ -535,10 +539,11 @@ class GameScene: SKScene {
     
     func encodeBases() -> [String] {
         var resultArray: [String] = []
+        var side = currentSide == .left ? "left" : "right"
         for (index, value) in BasesByParts.enumerated() {
             if let base = value.1 {
                 if let name = base.name {
-                    resultArray.append(name)
+                    resultArray.append(name + "_" + side)
                 }
             }
             else {
@@ -554,8 +559,11 @@ class GameScene: SKScene {
                 continue
             }
             else {
+                let divider = name.index(of: "_")!
+                let trueName = String(name[..<divider])
+                let side = String(name[divider...])
                 var newBase: SKSpriteNode
-                switch name {
+                switch trueName {
                 case "tone1":
                     newBase = SKSpriteNode(imageNamed: "square_stride_pink")
                 case "tone2":
@@ -567,15 +575,44 @@ class GameScene: SKScene {
                 default:
                     newBase = SKSpriteNode(imageNamed: "square_stride_pink")
                 }
-                newBase.name = name
-                addChild(newBase)
+
+                newBase.name = trueName
+
                 newBase.anchorPoint = CGPoint(x: 0, y: 0.5)
                 newBase.zPosition = 1
 
+                if currentSide == .left {
+                    newBase.position = CGPoint(x: 0, y: parts[index].position.y)
+                    let moveTo = SKAction.moveTo(x: parts.first!.position.x  + newBase.frame.width / 24, duration: 0.3)
+                    newBase.run(moveTo)
+                }
+                else {
+                    newBase.position = CGPoint(x: self.frame.width, y: parts[index].position.y)
+                    newBase.anchorPoint = CGPoint(x: 1, y: 0.5)
+                    let moveTo = SKAction.moveTo(x: parts.first!.position.x  - newBase.frame.width / 24, duration: 0.3)
+                    newBase.run(moveTo)
+                }
                 
-                newBase.position = CGPoint(x: parts.first!.position.x  + newBase.frame.width / 24, y: parts[index].position.y)
-                basesOnDna.append(newBase)
-                BasesByParts[index] = (BasesByParts[index].0, newBase)
+                print(side)
+                if currentSide == .left {
+                    if side == "_left" {
+                        addChild(newBase)
+                        basesOnDna.append(newBase)
+                        BasesByParts[index] = (BasesByParts[index].0, newBase)
+                    }
+                    else {
+                        rightBasesByParts[index] = (rightBasesByParts[index].0, newBase)
+                    }
+                } else {
+                    if side == "_left" {
+                        leftBasesByParts[index] = (leftBasesByParts[index].0, newBase)
+                    }
+                    else {
+                        addChild(newBase)
+                        basesOnDna.append(newBase)
+                        BasesByParts[index] = (BasesByParts[index].0, newBase)
+                    }
+                }
                 
             }
         }
@@ -609,6 +646,7 @@ class GameScene: SKScene {
             restorePositions(side: .right)
             showBars()
         }
+        gameSceneDelegate?.triggerSendData()
     }
     
     public func restorePositions(side: side) {
@@ -643,8 +681,8 @@ class GameScene: SKScene {
                     newBase.position = CGPoint(x: tuple.0.position.x + newBase.frame.width / 24, y: tuple.0.position.y)
                 }
                 else {
-                 newBase.anchorPoint = CGPoint(x: 1, y: 0.5)
-                 newBase.position = CGPoint(x: tuple.0.position.x - newBase.frame.width / 24, y: tuple.0.position.y)
+                    newBase.anchorPoint = CGPoint(x: 1, y: 0.5)
+                    newBase.position = CGPoint(x: tuple.0.position.x - newBase.frame.width / 24, y: tuple.0.position.y)
                 }
             }
         }
@@ -654,47 +692,84 @@ class GameScene: SKScene {
         removeSelection(side: currentSide)
         getOtherSide(side: currentSide)
         
+        if currentSide == .left {
+            for (index, part) in leftParts.enumerated() {
+                let waitFirst = SKAction.wait(forDuration: 1.2)
+                let wait = SKAction.wait(forDuration: Double(index) / Double(6))
+                let move2 = SKAction.moveBy(x: self.frame.size.width / 1.6 - part.position.x, y: 0, duration: 1)
+                move2.timingMode = .easeInEaseOut
+                let move3 = SKAction.moveBy(x: -(self.frame.size.width / 1.6 - part.position.x), y: 0, duration: 1)
+                move3.timingMode = .easeInEaseOut
+                let shrink = SKAction.scale(to: 0.5, duration: 1)
+                let grow = SKAction.scale(to: 1, duration: 1)
+                let sizeSequence = SKAction.sequence([shrink, grow])
+                let sequence = SKAction.sequence([move2, move3])
+                let group = SKAction.group([sequence, sizeSequence])
+                let repeatSequence = SKAction.repeatForever(sequence)
 
-        for (index, part) in leftParts.enumerated() {
-            let waitFirst = SKAction.wait(forDuration: 1.2)
-            let wait = SKAction.wait(forDuration: Double(index) / Double(6))
-            let move2 = SKAction.moveBy(x: self.frame.size.width / 1.6 - part.position.x, y: 0, duration: 1)
-            move2.timingMode = .easeInEaseOut
-            let move3 = SKAction.moveBy(x: -(self.frame.size.width / 1.6 - part.position.x), y: 0, duration: 1)
-            move3.timingMode = .easeInEaseOut
-            let shrink = SKAction.scale(to: 0.5, duration: 1)
-            let grow = SKAction.scale(to: 1, duration: 1)
-            let sizeSequence = SKAction.sequence([shrink, grow])
-            let sequence = SKAction.sequence([move2, move3])
-            let group = SKAction.group([sequence, sizeSequence])
-            let repeatSequence = SKAction.repeatForever(sequence)
-            
-            let finalSequence = SKAction.sequence([waitFirst, wait, repeatSequence])
-            
-            
-            
-            part.run(finalSequence)
+                let finalSequence = SKAction.sequence([waitFirst, wait, repeatSequence])
+
+                part.run(finalSequence)
+            }
+
+            for (index, part) in rightParts.enumerated() {
+                let waitFirst = SKAction.wait(forDuration: 1.2)
+                let wait = SKAction.wait(forDuration: Double(index) / Double(6))
+                let move2 = SKAction.moveBy(x: -(self.frame.size.width / 1.6 - leftParts.first!.position.x), y: 0, duration: 1)
+                move2.timingMode = .easeInEaseOut
+                let move3 = SKAction.moveBy(x: (self.frame.size.width / 1.6 - leftParts.first!.position.x), y: 0, duration: 1)
+                move3.timingMode = .easeInEaseOut
+                let shrink = SKAction.scale(to: 0.5, duration: 1)
+                let grow = SKAction.scale(to: 1, duration: 1)
+                let sizeSequence = SKAction.sequence([shrink, grow])
+                let sequence = SKAction.sequence([move2, move3])
+                let group = SKAction.group([sequence, sizeSequence])
+                let repeatSequence = SKAction.repeatForever(sequence)
+
+                let finalSequence = SKAction.sequence([waitFirst, wait, repeatSequence])
+
+                part.run(finalSequence)
+            }
         }
-        
-        for (index, part) in rightParts.enumerated() {
-            let waitFirst = SKAction.wait(forDuration: 1.2)
-            let wait = SKAction.wait(forDuration: Double(index) / Double(6))
-            let move2 = SKAction.moveBy(x: -(self.frame.size.width / 1.6 - leftParts.first!.position.x), y: 0, duration: 1)
-            move2.timingMode = .easeInEaseOut
-            let move3 = SKAction.moveBy(x: (self.frame.size.width / 1.6 - leftParts.first!.position.x), y: 0, duration: 1)
-            move3.timingMode = .easeInEaseOut
-            let shrink = SKAction.scale(to: 0.5, duration: 1)
-            let grow = SKAction.scale(to: 1, duration: 1)
-            let sizeSequence = SKAction.sequence([shrink, grow])
-            let sequence = SKAction.sequence([move2, move3])
-            let group = SKAction.group([sequence, sizeSequence])
-            let repeatSequence = SKAction.repeatForever(sequence)
+        else {
+            for (index, part) in leftParts.enumerated() {
+                let waitFirst = SKAction.wait(forDuration: 1.2)
+                let wait = SKAction.wait(forDuration: Double(index) / Double(6))
+                let move2 = SKAction.moveBy(x: (self.frame.size.width / 1.6 - part.position.x) / 2, y: 0, duration: 1)
+                move2.timingMode = .easeInEaseOut
+                let move3 = SKAction.moveBy(x: (-(self.frame.size.width / 1.6 - part.position.x)) / 2, y: 0, duration: 1)
+                move3.timingMode = .easeInEaseOut
+                let shrink = SKAction.scale(to: 0.5, duration: 1)
+                let grow = SKAction.scale(to: 1, duration: 1)
+                let sizeSequence = SKAction.sequence([shrink, grow])
+                let sequence = SKAction.sequence([move2, move3])
+                let group = SKAction.group([sequence, sizeSequence])
+                let repeatSequence = SKAction.repeatForever(sequence)
+                
+                let finalSequence = SKAction.sequence([waitFirst, wait, repeatSequence])
+                
+                part.run(finalSequence)
+            }
             
-            let finalSequence = SKAction.sequence([waitFirst, wait, repeatSequence])
-            
-            part.run(finalSequence)
+            for (index, part) in rightParts.enumerated() {
+                let waitFirst = SKAction.wait(forDuration: 1.2)
+                let wait = SKAction.wait(forDuration: Double(index) / Double(6))
+                let move2 = SKAction.moveBy(x: (-(self.frame.size.width / 1.6 - leftParts.first!.position.x)) / 2, y: 0, duration: 1)
+                move2.timingMode = .easeInEaseOut
+                let move3 = SKAction.moveBy(x: ((self.frame.size.width / 1.6 - leftParts.first!.position.x)) / 2, y: 0, duration: 1)
+                move3.timingMode = .easeInEaseOut
+                let shrink = SKAction.scale(to: 0.5, duration: 1)
+                let grow = SKAction.scale(to: 1, duration: 1)
+                let sizeSequence = SKAction.sequence([shrink, grow])
+                let sequence = SKAction.sequence([move2, move3])
+                let group = SKAction.group([sequence, sizeSequence])
+                let repeatSequence = SKAction.repeatForever(sequence)
+                
+                let finalSequence = SKAction.sequence([waitFirst, wait, repeatSequence])
+                
+                part.run(finalSequence)
+            }
         }
-        
     }
     
     func resizeBases() {
