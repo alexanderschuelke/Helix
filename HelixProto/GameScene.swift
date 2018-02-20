@@ -42,6 +42,7 @@ class GameScene: SKScene {
     
     // For dragging bases
     private let panRecognizer = UIPanGestureRecognizer()
+
     // Currently moved base
     private var currentBase: SKSpriteNode?
     private var currentPart: SKSpriteNode?
@@ -135,6 +136,13 @@ class GameScene: SKScene {
         opener = false
 //        decodeBases(data: ["", "tone1", "", "", "tone3", "", "", "tone4", "", "", "", ""])
         
+        
+        let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(GameScene.swipe(_:)))
+        swipeLeft.direction = .left
+        self.view!.addGestureRecognizer(swipeLeft)
+        let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(GameScene.swipe(_:)))
+        swipeRight.direction = .right
+        self.view!.addGestureRecognizer(swipeRight)
     }
     
     func buildParts(side: side) {
@@ -224,6 +232,14 @@ class GameScene: SKScene {
        
     }
     
+    @objc func swipe(_ gesture: UISwipeGestureRecognizer) -> Void {
+        if gesture.direction == .left {
+            gameSceneDelegate?.swipeLeft()
+        } else if gesture.direction == .right {
+            gameSceneDelegate?.swipeRight()
+        }
+    }
+    
     // Gets called by the UIPanGestureRecognizer.
     // Describes the behaviour while being dragged and what should happen at the end of a drag.
     @objc func drag(_ gestureRecognizer: UIPanGestureRecognizer) {
@@ -234,7 +250,6 @@ class GameScene: SKScene {
 
             if scrolling {
                 if !blockScrolling {
-                    print("\(parts.first!.position.y) \(maxTopPosition)")
                     if parts.first!.position.y < maxTopPosition && translation.y > 0{
                         return
                     }
@@ -245,6 +260,7 @@ class GameScene: SKScene {
                             let newPart = SKSpriteNode(imageNamed: "circle_orange")
                             newPart.zPosition = 3
                             newPart.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+                            newPart.alpha = 0.5
                             parts.append(newPart)
                             BasesByParts.append((newPart, nil))
                             addChild(newPart)
@@ -307,9 +323,19 @@ class GameScene: SKScene {
                             currentBase.anchorPoint = CGPoint(x: 1, y: 0.5)
                             newPosition = CGPoint(x: nearest.position.x - (currentBase.frame.width / 24), y: nearest.position.y)
                         }
+                        let blockScroll = SKAction.run {
+                            self.blockScrolling = true
+                        }
+                        let enableScroll = SKAction.run {
+                            self.blockScrolling = false
+                        }
                         let snap = SKAction.move(to: newPosition, duration: 0.1)
-                        currentBase.run(snap)
+                        let sequence = SKAction.sequence([blockScroll, snap, enableScroll])
+                        currentBase.run(sequence)
+                        print(basesOnDna.count)
+                        if !basesOnDna.contains(currentBase) {
                         basesOnDna.append(currentBase)
+                        }
                         for (index, tuple) in BasesByParts.enumerated() {
                             if tuple.0 == nearest {
                                 cleanOldParts(from: currentBase)
@@ -620,7 +646,7 @@ class GameScene: SKScene {
                     newBase.run(moveTo)
                 }
                 
-                print(side)
+
                 if currentSide == .left {
                     if side == "_left" {
                         addChild(newBase)

@@ -11,5 +11,7 @@ import Foundation
 protocol GameDelegate {
    
     func triggerSendData()
+    func swipeLeft()
+    func swipeRight()
     
 }

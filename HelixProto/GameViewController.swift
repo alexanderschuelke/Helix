@@ -154,6 +154,14 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
         sendSequence()
     }
     
+    func swipeLeft() {
+        segmentedControl.selectedSegmentIndex = 0
+    }
+    
+    func swipeRight() {
+        segmentedControl.selectedSegmentIndex = 2
+    }
+    
     
     // IGNORE
     
