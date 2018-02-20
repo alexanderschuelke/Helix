@@ -235,7 +235,7 @@ class GameScene: SKScene {
             if scrolling {
                 if !blockScrolling {
                     print("\(parts.first!.position.y) \(maxTopPosition)")
-                    if parts.first!.position.y > maxTopPosition && translation.y < 0{
+                    if parts.first!.position.y < maxTopPosition && translation.y > 0{
                         return
                     }
                 for part in parts.reversed() {
