@@ -655,12 +655,99 @@ class GameScene: SKScene {
     }
     
     private func getOtherSide(side: side) {
-//        if side == .left {
-//            for base
-//        }
-//        else {
-//
-//        }
+        if side == .left {
+            for (index, part) in rightParts.enumerated() {
+                addChild(part)
+                let wait = SKAction.wait(forDuration: 0.4)
+                part.position = CGPoint(x: self.frame.width, y: self.frame.height - part.frame.height * 1.5 * CGFloat(index))
+                let finalPosition = self.frame.size.width / 1.6
+                let moveTo = SKAction.moveTo(x: finalPosition, duration: 0.5)
+                let sequence = SKAction.sequence([wait, moveTo])
+                part.run(sequence)
+            }
+            for (index, tuple) in rightBasesByParts.enumerated() {
+                if let base = tuple.1 {
+                    var spriteName = "square_stride_pink"
+                    var tonename = "tone1"
+                    if let name = base.name {
+                        switch name {
+                        case "tone1":
+                            spriteName = "square_stride_pink"
+                        case "tone2":
+                            spriteName = "square_stride_orange"
+                        case "tone3":
+                            spriteName = "square_stride_light"
+                        case "tone4":
+                            spriteName = "square_stride_white"
+                        default:
+                            spriteName = "square_stride_pink"
+                        }
+                        tonename = name
+                    }
+                    var newBase = SKSpriteNode(imageNamed: spriteName)
+                    basesOnDna.append(newBase)
+                    newBase.name = tonename
+                    addChild(newBase)
+                    newBase.anchorPoint = CGPoint(x: 0, y: 0.5)
+                    newBase.zPosition = 1
+
+                    let wait = SKAction.wait(forDuration: 0.4)
+                    newBase.anchorPoint = CGPoint(x: 1, y: 0.5)
+                    newBase.position = CGPoint(x: self.frame.width, y: tuple.0.position.y)
+                    let finalPosition = self.frame.size.width / 1.6 + newBase.frame.width / 24
+                    let moveTo = SKAction.moveTo(x: finalPosition, duration: 0.5)
+                    let sequence = SKAction.sequence([wait, moveTo])
+                    newBase.run(sequence)
+
+                }
+            }
+        }
+        else {
+            for (index, part) in leftParts.enumerated() {
+                addChild(part)
+                let wait = SKAction.wait(forDuration: 0.4)
+                part.position = CGPoint(x: 0, y: self.frame.height - part.frame.height * 1.5 * CGFloat(index))
+                let finalPosition = self.frame.size.width / 2.8
+                let moveTo = SKAction.moveTo(x: finalPosition, duration: 0.5)
+                let sequence = SKAction.sequence([wait, moveTo])
+                part.run(sequence)
+            }
+            for (index, tuple) in leftBasesByParts.enumerated() {
+                if let base = tuple.1 {
+                    var spriteName = "square_stride_pink"
+                    var tonename = "tone1"
+                    if let name = base.name {
+                        switch name {
+                        case "tone1":
+                            spriteName = "square_stride_pink"
+                        case "tone2":
+                            spriteName = "square_stride_orange"
+                        case "tone3":
+                            spriteName = "square_stride_light"
+                        case "tone4":
+                            spriteName = "square_stride_white"
+                        default:
+                            spriteName = "square_stride_pink"
+                        }
+                        tonename = name
+                    }
+                    var newBase = SKSpriteNode(imageNamed: spriteName)
+                    basesOnDna.append(newBase)
+                    newBase.name = tonename
+                    addChild(newBase)
+                    newBase.zPosition = 1
+                    
+                    let wait = SKAction.wait(forDuration: 0.4)
+                    newBase.anchorPoint = CGPoint(x: 0, y: 0.5)
+                    newBase.position = CGPoint(x: 0, y: tuple.0.position.y)
+                    let finalPosition = self.frame.size.width / 2.8 - newBase.frame.width / 24
+                    let moveTo = SKAction.moveTo(x: finalPosition, duration: 0.5)
+                    let sequence = SKAction.sequence([wait, moveTo])
+                    newBase.run(sequence)
+
+                }
+            }
+        }
     }
     
 }
