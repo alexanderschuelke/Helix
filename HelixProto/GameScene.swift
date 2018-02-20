@@ -38,7 +38,7 @@ class GameScene: SKScene {
     private var leftBases: [Int:SKSpriteNode] = [:]
     private var leftBasesByParts: [(SKSpriteNode, SKSpriteNode?)] = []
     
-    private let audioManager = AudioManager()
+    public let audioManager = AudioManager()
     
     // For dragging bases
     private let panRecognizer = UIPanGestureRecognizer()
