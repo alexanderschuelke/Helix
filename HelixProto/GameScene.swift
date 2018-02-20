@@ -53,6 +53,8 @@ class GameScene: SKScene {
     private var currentSequencerPosition = -1
     private var currentSide: side = side.left
     private var opener = true
+    private var blockScrolling = false
+    
     override init(size: CGSize) {
         // Create the one side of the DNA string.
         for index in 0...11 {
@@ -220,6 +222,7 @@ class GameScene: SKScene {
             let translation = gestureRecognizer.translation(in: self.view)
 
             if scrolling {
+                if !blockScrolling {
                 for part in parts.reversed() {
                     part.position = CGPoint(x: part.position.x, y: part.position.y - translation.y*2)
                     if part == parts.last! {
@@ -242,6 +245,7 @@ class GameScene: SKScene {
                 }
                 for base in basesOnDna {
                     base.position = CGPoint(x: base.position.x, y: base.position.y - translation.y * 2)
+                }
                 }
                 gestureRecognizer.setTranslation(CGPoint.zero, in: self.view)
             }
@@ -295,6 +299,8 @@ class GameScene: SKScene {
                             if tuple.0 == nearest {
                                 cleanOldParts(from: currentBase)
                                 BasesByParts[index] = (nearest, currentBase)
+                                audioManager.beatsAmount = audioManager.checkBeatAmount()
+                                showBars()
                                 gameSceneDelegate?.triggerSendData()
                             }
                         }
@@ -307,8 +313,15 @@ class GameScene: SKScene {
                 // Move bases back to original position, because it could not snap with any DNA slot
                 if let originalBasePosition = self.originalBasePosition {
                     removeSelectionFrame()
+                    let blockScroll = SKAction.run {
+                        self.blockScrolling = true
+                    }
+                    let enableScroll = SKAction.run {
+                        self.blockScrolling = false
+                    }
                     let snapBack = SKAction.move(to: originalBasePosition, duration: 0.3)
-                    currentBase.run(snapBack)
+                    let sequence = SKAction.sequence([blockScroll, snapBack, enableScroll])
+                    currentBase.run(sequence)
                 }
             }
         }
@@ -635,6 +648,8 @@ class GameScene: SKScene {
             buildParts(side: .left)
             buildBases(side: .left)
             restorePositions(side: .left)
+            audioManager.beatsAmount = audioManager.checkBeatAmount()
+            showBars()
         case .right:
             currentSide = .right
             parts = rightParts
@@ -644,6 +659,7 @@ class GameScene: SKScene {
             buildParts(side: .right)
             buildBases(side: .right)
             restorePositions(side: .right)
+            audioManager.beatsAmount = audioManager.checkBeatAmount()
             showBars()
         }
         gameSceneDelegate?.triggerSendData()
