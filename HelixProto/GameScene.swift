@@ -648,28 +648,32 @@ class GameScene: SKScene {
                 
 
                 if side == "_left" && currentSide == .left && trueName == ""{
-                    if let base = BasesByParts[index].1 {
-                        BasesByParts[index] = (BasesByParts[index].0, nil)
-                        let remove = SKAction.moveTo(x: 0, duration: 0.2)
-                        let trash = SKAction.run {
-                            base.removeFromParent()
+                    if index < BasesByParts.count {
+                        if let base = BasesByParts[index].1 {
+                            BasesByParts[index] = (BasesByParts[index].0, nil)
+                            let remove = SKAction.moveTo(x: 0, duration: 0.2)
+                            let trash = SKAction.run {
+                                base.removeFromParent()
+                            }
+                            let sequence = SKAction.sequence([remove, trash])
+                            base.run(sequence)
                         }
-                        let sequence = SKAction.sequence([remove, trash])
-                        base.run(sequence)
+                        continue
                     }
-                    continue
                 }
                 if side == "_right" && currentSide == .right && trueName == ""{
+                    if index < BasesByParts.count {
                     if let base = BasesByParts[index].1 {
-                        BasesByParts[index] = (BasesByParts[index].0, nil)
-                        let remove = SKAction.moveTo(x: self.frame.width, duration: 0.2)
-                        let trash = SKAction.run {
-                            base.removeFromParent()
+                            BasesByParts[index] = (BasesByParts[index].0, nil)
+                            let remove = SKAction.moveTo(x: self.frame.width, duration: 0.2)
+                            let trash = SKAction.run {
+                                base.removeFromParent()
+                            }
+                            let sequence = SKAction.sequence([remove, trash])
+                            base.run(sequence)
                         }
-                        let sequence = SKAction.sequence([remove, trash])
-                        base.run(sequence)
+                        continue
                     }
-                    continue
                 }
                 if trueName == "" {
                     continue
@@ -805,7 +809,9 @@ class GameScene: SKScene {
                     tonename = name
                 }
                 var newBase = SKSpriteNode(imageNamed: spriteName)
-//                basesOnDna.remove(at: basesOnDna.index(of: base)!)
+                if let p = basesOnDna.index(of: base) {
+                    basesOnDna.remove(at: p)
+                }
                 basesOnDna.append(newBase)
                 newBase.name = tonename
                 addChild(newBase)
