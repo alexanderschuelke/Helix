@@ -193,7 +193,7 @@ class GameScene: SKScene {
                 addChild(base)
                 base.anchorPoint = CGPoint(x: 0, y: 0.5)
                 base.zPosition = 1
-                base.name = "tone\(index+1)"
+                base.name = "tone\(index+1).\(base.id)"
                 let overallHeight = base.frame.size.height * CGFloat(bases.count)
                 base.position = CGPoint(x: self.frame.size.width / 1.68, y: (self.frame.size.height / 2) + (overallHeight / 2) - (base.frame.size.height * 3 * CGFloat(index)))
             }
@@ -202,7 +202,7 @@ class GameScene: SKScene {
                 addChild(base)
                 base.anchorPoint = CGPoint(x: 0, y: 0.5)
                 base.zPosition = 1
-                base.name = "tone\(index+1)"
+                base.name = "tone\(index+1).\(base.id)"
                 let overallHeight = base.frame.size.height * CGFloat(rightBases.count)
                 base.position = CGPoint(x: self.frame.size.width / 3.88, y: (self.frame.size.height / 2) + (overallHeight / 2) - (base.frame.size.height * 3 * CGFloat(index)))
             }
@@ -501,7 +501,10 @@ class GameScene: SKScene {
                 }
                 if bases.values.contains(node) || basesOnDna.contains(node){
                     if let name = node.name {
-                        audioManager.playSample(baseName: name)
+                        if let divider = name.index(of: ".") {
+                            let shortName = String(name[..<divider])
+                            audioManager.playSample(baseName: shortName)
+                        }
                     }
                     originalBasePosition = node.position
                     currentBase = node
@@ -551,7 +554,7 @@ class GameScene: SKScene {
                 newBase = SKSpriteNode(imageNamed: "square_stride_pink")
             }
             bases[position] = newBase
-            newBase.name = "tone\(position+1)"
+            newBase.name = "tone\(position+1).\(newBase.id)"
             addChild(newBase)
             newBase.anchorPoint = CGPoint(x: 0, y: 0.5)
             newBase.zPosition = 1
@@ -642,12 +645,20 @@ class GameScene: SKScene {
             }
             else {
                 
-                let divider = name.index(of: "_")!
-                let trueName = String(name[..<divider])
-                let side = String(name[divider...])
+                var pureName = ""
+                var withID = ""
+                var side = ""
+                if let divider = name.index(of: "_") {
+                    withID = String(name[..<divider])
+                    side = String(name[divider...])
+                    if let divider2 = withID.index(of: ".") {
+                        pureName = String(withID[..<divider2])
+                    }
+                }
+
                 
 
-                if side == "_left" && currentSide == .left && trueName == ""{
+                if side == "_left" && currentSide == .left && pureName == ""{
                     if index < BasesByParts.count {
                         if let base = BasesByParts[index].1 {
                             BasesByParts[index] = (BasesByParts[index].0, nil)
@@ -661,7 +672,7 @@ class GameScene: SKScene {
                         continue
                     }
                 }
-                if side == "_right" && currentSide == .right && trueName == ""{
+                if side == "_right" && currentSide == .right && pureName == ""{
                     if index < BasesByParts.count {
                     if let base = BasesByParts[index].1 {
                             BasesByParts[index] = (BasesByParts[index].0, nil)
@@ -675,7 +686,7 @@ class GameScene: SKScene {
                         continue
                     }
                 }
-                if trueName == "" {
+                if pureName == "" {
                     continue
                 }
                 if side == "_left" && currentSide == .left && !isPartEmpty(BasesByParts[index].0) {
@@ -685,7 +696,7 @@ class GameScene: SKScene {
                     continue
                 }
                 var newBase: SKSpriteNode
-                switch trueName {
+                switch pureName {
                 case "tone1":
                     newBase = SKSpriteNode(imageNamed: "square_stride_pink")
                 case "tone2":
@@ -698,7 +709,7 @@ class GameScene: SKScene {
                     newBase = SKSpriteNode(imageNamed: "square_stride_pink")
                 }
 
-                newBase.name = trueName
+                newBase.name = withID
 
                 newBase.anchorPoint = CGPoint(x: 0, y: 0.5)
                 newBase.zPosition = 1
@@ -794,7 +805,12 @@ class GameScene: SKScene {
                 var spriteName = "square_stride_pink"
                 var tonename = "tone1"
                 if let name = base.name {
-                    switch name {
+                    var newName = "tone1"
+                    if let divider = name.index(of: ".") {
+                        newName = String(name[..<divider])
+                    }
+                    print(newName)
+                    switch newName {
                         case "tone1":
                         spriteName = "square_stride_pink"
                         case "tone2":

@@ -18,6 +18,8 @@ extension CGPoint {
 
 extension SKSpriteNode {
 
+    var id: Int { return Int(arc4random_uniform(1000000)) }
+    
     // Simple press animation
     public func playPressedAnimation() {
         let scale = SKAction.scale(to: CGSize(width: self.size.width / CGFloat(1.2), height: self.size.height / CGFloat(1.2)), duration: 0.1)
