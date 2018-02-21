@@ -359,7 +359,6 @@ class GameScene: SKScene {
                             if tuple.0 == nearest {
                                 cleanOldParts(from: currentBase)
                                 BasesByParts[index] = (nearest, currentBase)
-                                audioManager.beatsAmount = audioManager.checkBeatAmount(basesByParts: BasesByParts, parts: parts)
                                 showBars()
                                 gameSceneDelegate?.triggerSendData()
                             }
@@ -443,6 +442,7 @@ class GameScene: SKScene {
                 let sequence = SKAction.sequence([leaveScreen, remove])
                 base.run(sequence)
                 reloadSample(for: base)
+                showBars()
                 gameSceneDelegate?.triggerSendData()
                 return true
             }
@@ -463,7 +463,7 @@ class GameScene: SKScene {
                 let sequence = SKAction.sequence([leaveScreen, remove])
                 base.run(sequence)
                 reloadSample(for: base)
-
+                showBars()
                 gameSceneDelegate?.triggerSendData()
                 return true
             }
@@ -605,6 +605,8 @@ class GameScene: SKScene {
     }
     
     func showBars() {
+        
+        audioManager.beatsAmount = audioManager.checkBeatAmount(basesByParts: BasesByParts, parts: parts)
       
         let bars = audioManager.beatsAmount
 
@@ -789,7 +791,6 @@ class GameScene: SKScene {
             buildParts(side: .left)
             buildBases(side: .left)
             restorePositions(side: .left)
-            audioManager.beatsAmount = audioManager.checkBeatAmount(basesByParts: BasesByParts, parts: parts)
             showBars()
         case .right:
             currentSide = .right
@@ -801,8 +802,6 @@ class GameScene: SKScene {
             buildParts(side: .right)
             buildBases(side: .right)
             restorePositions(side: .right)
-            audioManager.beatsAmount = audioManager.checkBeatAmount(basesByParts: BasesByParts, parts: parts)
-
             showBars()
         }
         gameSceneDelegate?.triggerSendData()
