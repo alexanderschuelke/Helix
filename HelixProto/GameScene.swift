@@ -61,7 +61,8 @@ class GameScene: SKScene {
     private var clearRightSide = false
     private var basesToClearRight: [Int] = []
     private var deleteLater: [Int] = []
-    
+    private var basesByIDs: [(String, (SKSpriteNode, Double))] = []
+    private var timing = 0.0
     override init(size: CGSize) {
         // Create the one side of the DNA string.
         for index in 0...11 {
@@ -218,6 +219,7 @@ class GameScene: SKScene {
 //                printBasesByParts()
         let newSequencerPosition = audioManager.sequencer.currentRelativePosition.beats.isNaN ? 1 : Int(audioManager.sequencer.currentRelativePosition.beats)
         
+  
 
         if currentSequencerPosition != newSequencerPosition && audioManager.sequencer.isPlaying {
             currentSequencerPosition = newSequencerPosition
@@ -226,7 +228,8 @@ class GameScene: SKScene {
             showBars()
 
         }
-        
+
+        timing += 0.01
 //        if audioManager.sequencer.isPlaying {
 //            for currentBase in basesOnDna {
 //                for (index, value) in rightBasesByParts.enumerated() {
@@ -647,15 +650,29 @@ class GameScene: SKScene {
                 
                 var pureName = ""
                 var withID = ""
+                var ownID = ""
                 var side = ""
                 if let divider = name.index(of: "_") {
                     withID = String(name[..<divider])
                     side = String(name[divider...])
                     if let divider2 = withID.index(of: ".") {
                         pureName = String(withID[..<divider2])
+                        ownID = String(name[divider2..<divider])
                     }
                 }
 
+//                if pureName != "" {
+//                    for (index, value) in BasesByParts.enumerated() {
+//                        if let bean = value.1 {
+//                            if let divider = bean.name!.index(of: "_"), let divider2 = bean.name!.index(of: ".") {
+//                                let beanID = String(bean.name![divider2..<divider])
+//                                if beanID == ownID {
+//                                    continue
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
                 
 
                 if side == "_left" && currentSide == .left && pureName == ""{
@@ -710,7 +727,7 @@ class GameScene: SKScene {
                 }
 
                 newBase.name = withID
-
+                basesByIDs.append((ownID, (newBase, timing)))
                 newBase.anchorPoint = CGPoint(x: 0, y: 0.5)
                 newBase.zPosition = 1
 
@@ -766,7 +783,9 @@ class GameScene: SKScene {
             if !opener {
                 rightBasesByParts = BasesByParts
             }
+            
             BasesByParts = leftBasesByParts
+            kickBases()
             buildParts(side: .left)
             buildBases(side: .left)
             restorePositions(side: .left)
@@ -778,14 +797,55 @@ class GameScene: SKScene {
             bases = rightBases
             leftBasesByParts = BasesByParts
             BasesByParts = rightBasesByParts
+            kickBases()
             buildParts(side: .right)
             buildBases(side: .right)
             restorePositions(side: .right)
             audioManager.beatsAmount = audioManager.checkBeatAmount(basesByParts: BasesByParts, parts: parts)
+
             showBars()
         }
         gameSceneDelegate?.triggerSendData()
 
+    }
+    
+    public func kickBases() {
+        print("function call")
+        for (index, outerValue) in BasesByParts.enumerated() {
+            print("begin loop")
+            if let base = outerValue.1 {
+                print("base from baseparts")
+                if let name = base.name {
+                    print("name of base \(name)")
+                        if let divider2 = name.index(of: ".") {
+                            let ownID = String(name[divider2...])
+                            print(ownID)
+                            var exists = false
+                            var firstBase: SKSpriteNode
+                            var firstTiming = 0.0
+                            for (index, value) in basesByIDs.enumerated() {
+                                let id = value.0
+                                if id == ownID && !exists {
+                                    print("first found!")
+                                    exists = true
+                                    firstBase = value.1.0
+                                    firstTiming = value.1.1
+                                } else if id == ownID && exists {
+                                    print("second found!")
+                                    let secondBase = value.1.0
+                                    let secondTiming = value.1.1
+                                    if firstTiming < secondTiming {
+                                        print("first shorter")
+                                        BasesByParts[index] = (BasesByParts[index].0, nil)
+                                        base.removeFromParent()
+                                        print("TRIUMPH")
+                                    }
+                                }
+                            }
+                        }
+                    }
+            }
+        }
     }
     
     public func restorePositions(side: side) {
@@ -809,7 +869,7 @@ class GameScene: SKScene {
                     if let divider = name.index(of: ".") {
                         newName = String(name[..<divider])
                     }
-                    print(newName)
+  
                     switch newName {
                         case "tone1":
                         spriteName = "square_stride_pink"
