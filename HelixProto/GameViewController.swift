@@ -13,9 +13,18 @@ import MultipeerConnectivity
 
 class GameViewController: UIViewController, UINavigationControllerDelegate, MCBrowserViewControllerDelegate, MCSessionDelegate, GameDelegate {
 
+    enum States {
+        case requesting
+        case sending
+
+    }
+    
+
     @IBOutlet weak var segmentedControl: UISegmentedControl!
     @IBOutlet weak var tempoLabel: UILabel!
     @IBOutlet weak var tempoStepper: UIStepper!
+    
+    private var requestState : States = .sending
     
     @IBAction func indexChanged(_ sender: Any) {
         switch segmentedControl.selectedSegmentIndex {
@@ -35,7 +44,13 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
     }
     
     @IBAction func sendButton(_ sender: Any) {
-        sendSequence()
+        self.requestState = .requesting
+        var requestType = ""
+        let alert = UIAlertController(title: "DNA Request", message: "Do you want to request the rhythm or the melody part?", preferredStyle: UIAlertControllerStyle.alert)
+        alert.addAction(UIAlertAction(title: "Melody", style: UIAlertActionStyle.default, handler: {(alert: UIAlertAction!) in requestType = "melody"; self.sendSequence(requestType: "melody"); self.scene!.requestType = requestType}))
+        alert.addAction(UIAlertAction(title: "Rhythm", style: UIAlertActionStyle.default, handler: {(alert: UIAlertAction!) in requestType = "rhythm"; self.sendSequence(requestType: "rhythm"); self.scene!.requestType = requestType}))
+        self.present(alert, animated: true, completion: nil)
+        
     }
 
     @IBAction func changeTempo(_ sender: Any) {
@@ -51,11 +66,18 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
     
     var scene: GameScene?
     
-    func sendSequence() {
+    func sendSequence(requestType: String) {
         if mcSession.connectedPeers.count > 0 {
-            let newData = NSKeyedArchiver.archivedData(withRootObject: scene?.encodeBases())
             do {
-                try mcSession.send(newData, toPeers: mcSession.connectedPeers, with: .reliable)
+                if requestState == .requesting {
+                    var array: [String] = []
+                    array.append(requestType)
+                    let requestType = NSKeyedArchiver.archivedData(withRootObject: array)
+                    try mcSession.send(requestType, toPeers: mcSession.connectedPeers, with: .reliable)
+                } else if requestState == .sending {
+                    let newData = NSKeyedArchiver.archivedData(withRootObject: scene?.encodeBases(for: requestType))
+                   try mcSession.send(newData, toPeers: mcSession.connectedPeers, with: .reliable)
+                }
             } catch let error as NSError {
                 let ac = UIAlertController(title: "Send error", message: error.localizedDescription, preferredStyle: .alert)
                 ac.addAction(UIAlertAction(title: "OK", style: .default))
@@ -151,7 +173,7 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
     }
     
     func triggerSendData() {
-        sendSequence()
+        sendSequence(requestType: "")
     }
     
     func swipeLeft() {
@@ -166,8 +188,17 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
     // IGNORE
     
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-        let array = NSKeyedUnarchiver.unarchiveObject(with: data) as! Array<String>
-        scene?.decodeBases(data: array)
+        if requestState == .sending {
+            print("HELLOOOO")
+            let requestType = NSKeyedUnarchiver.unarchiveObject(with: data) as! Array<String>
+            sendSequence(requestType: requestType[0])
+  
+        } else if requestState == .requesting {
+            let array = NSKeyedUnarchiver.unarchiveObject(with: data) as! Array<(SKSpriteNode, SKSpriteNode?)>
+            scene?.decodeBases(data: array)
+            requestState = .sending
+        }
+
     }
     
     func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {
