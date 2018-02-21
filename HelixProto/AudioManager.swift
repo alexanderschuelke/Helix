@@ -151,7 +151,7 @@ class AudioManager {
         }
         let beatsAmountPassive = checkBeatAmount(basesByParts: passiveBasesByParts, parts: passiveParts)
         let finalBeatAmount = beatsAmountCurrent > beatsAmountPassive ? beatsAmountCurrent : beatsAmountPassive
-        sequencer.setLength(AKDuration(beats: beatsAmountCurrent))
+        sequencer.setLength(AKDuration(beats: finalBeatAmount))
         sequencer.enableLooping()
         sequencerPassive.setLength(AKDuration(beats: beatsAmountPassive))
         sequencerPassive.enableLooping()

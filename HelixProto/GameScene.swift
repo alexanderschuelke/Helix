@@ -56,6 +56,11 @@ class GameScene: SKScene {
     private var opener = true
     private var blockScrolling = false
     private var maxTopPosition: CGFloat = 0
+    private var clearLeftSide = false
+    private var basesToClearLeft: [Int] = []
+    private var clearRightSide = false
+    private var basesToClearRight: [Int] = []
+    private var deleteLater: [Int] = []
     
     override init(size: CGSize) {
         // Create the one side of the DNA string.
@@ -170,6 +175,17 @@ class GameScene: SKScene {
         }
     }
     
+    func printBasesByParts() {
+        var result = "----normal----"
+        for (index, value) in BasesByParts.enumerated() {
+            if let base = value.1 {
+                result += "[\(index)]: \(base.name!)"
+            }
+        }
+        print(result)
+ 
+    }
+    
     func buildBases(side: side) {
         switch side {
         case .left:
@@ -199,7 +215,7 @@ class GameScene: SKScene {
     
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
-        
+//                printBasesByParts()
         let newSequencerPosition = audioManager.sequencer.currentRelativePosition.beats.isNaN ? 1 : Int(audioManager.sequencer.currentRelativePosition.beats)
         
 
@@ -332,7 +348,7 @@ class GameScene: SKScene {
                         let snap = SKAction.move(to: newPosition, duration: 0.1)
                         let sequence = SKAction.sequence([blockScroll, snap, enableScroll])
                         currentBase.run(sequence)
-                        print(basesOnDna.count)
+
                         if !basesOnDna.contains(currentBase) {
                         basesOnDna.append(currentBase)
                         }
@@ -414,6 +430,7 @@ class GameScene: SKScene {
             let leftMostPoint = base.position
             base.anchorPoint = oldAnchorPoint
             if (leftMostPoint.x < parts.first!.position.x - parts.first!.frame.size.width * 2 && basesOnDna.contains(base)) {
+
                 cleanOldParts(from: base)
                 basesOnDna.remove(at: basesOnDna.index(of: base)!)
                 let leaveScreen = SKAction.moveTo(x: base.position.x - base.frame.size.width * 2, duration: 0.5)
@@ -423,6 +440,7 @@ class GameScene: SKScene {
                 let sequence = SKAction.sequence([leaveScreen, remove])
                 base.run(sequence)
                 reloadSample(for: base)
+                gameSceneDelegate?.triggerSendData()
                 return true
             }
         }
@@ -432,6 +450,7 @@ class GameScene: SKScene {
             let rightMostPoint = base.position
             base.anchorPoint = oldAnchorPoint
             if (rightMostPoint.x > parts.first!.position.x + parts.first!.frame.size.width * 2 && basesOnDna.contains(base)) {
+
                 cleanOldParts(from: base)
                 basesOnDna.remove(at: basesOnDna.index(of: base)!)
                 let leaveScreen = SKAction.moveTo(x: self.frame.width, duration: 0.5)
@@ -441,6 +460,8 @@ class GameScene: SKScene {
                 let sequence = SKAction.sequence([leaveScreen, remove])
                 base.run(sequence)
                 reloadSample(for: base)
+
+                gameSceneDelegate?.triggerSendData()
                 return true
             }
         }
@@ -450,6 +471,7 @@ class GameScene: SKScene {
     // In this method it is set which base the user wants to move right now,
     // which means to set 'currentBase', so the drag method can work properly.
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+
         for touch in touches {
             let location = touch.location(in: self)
             let nodes = self.nodes(at: location)
@@ -594,27 +616,70 @@ class GameScene: SKScene {
         var resultArray: [String] = []
         var side = currentSide == .left ? "left" : "right"
         for (index, value) in BasesByParts.enumerated() {
+
             if let base = value.1 {
                 if let name = base.name {
                     resultArray.append(name + "_" + side)
                 }
             }
             else {
-                resultArray.append("")
+                resultArray.append("_\(side)")
             }
         }
+        basesToClearRight.removeAll()
+        basesToClearLeft.removeAll()
+        clearLeftSide = false
+        clearRightSide = false
         return resultArray
     }
     
     func decodeBases(data: [String]) {
+
         for (index, name) in data.enumerated() {
-            if name == "" || !isPartEmpty(BasesByParts[index].0) {
+            if name == "" {
+                print("skip")
                 continue
             }
             else {
+                
                 let divider = name.index(of: "_")!
                 let trueName = String(name[..<divider])
                 let side = String(name[divider...])
+                
+
+                if side == "_left" && currentSide == .left && trueName == ""{
+                    if let base = BasesByParts[index].1 {
+                        BasesByParts[index] = (BasesByParts[index].0, nil)
+                        let remove = SKAction.moveTo(x: 0, duration: 0.2)
+                        let trash = SKAction.run {
+                            base.removeFromParent()
+                        }
+                        let sequence = SKAction.sequence([remove, trash])
+                        base.run(sequence)
+                    }
+                    continue
+                }
+                if side == "_right" && currentSide == .right && trueName == ""{
+                    if let base = BasesByParts[index].1 {
+                        BasesByParts[index] = (BasesByParts[index].0, nil)
+                        let remove = SKAction.moveTo(x: self.frame.width, duration: 0.2)
+                        let trash = SKAction.run {
+                            base.removeFromParent()
+                        }
+                        let sequence = SKAction.sequence([remove, trash])
+                        base.run(sequence)
+                    }
+                    continue
+                }
+                if trueName == "" {
+                    continue
+                }
+                if side == "_left" && currentSide == .left && !isPartEmpty(BasesByParts[index].0) {
+                    continue
+                }
+                if side == "_right" && currentSide == .right && !isPartEmpty(BasesByParts[index].0) {
+                    continue
+                }
                 var newBase: SKSpriteNode
                 switch trueName {
                 case "tone1":
@@ -649,11 +714,13 @@ class GameScene: SKScene {
 
                 if currentSide == .left {
                     if side == "_left" {
+
                         addChild(newBase)
                         basesOnDna.append(newBase)
                         BasesByParts[index] = (BasesByParts[index].0, newBase)
                     }
                     else {
+
                         rightBasesByParts[index] = (rightBasesByParts[index].0, newBase)
                     }
                 } else {
@@ -703,11 +770,23 @@ class GameScene: SKScene {
             showBars()
         }
         gameSceneDelegate?.triggerSendData()
+
     }
     
     public func restorePositions(side: side) {
         for (index, tuple) in BasesByParts.enumerated() {
             if let base = tuple.1 {
+                
+                if deleteLater.contains(index) {
+                    BasesByParts[index] = (BasesByParts[index].0, nil)
+                    let remove = SKAction.moveTo(x: self.frame.width, duration: 0.2)
+                    let trash = SKAction.run {
+                        base.removeFromParent()
+                    }
+                    let sequence = SKAction.sequence([remove, trash])
+                    base.run(sequence)
+                }
+                
                 var spriteName = "square_stride_pink"
                 var tonename = "tone1"
                 if let name = base.name {
@@ -726,7 +805,7 @@ class GameScene: SKScene {
                     tonename = name
                 }
                 var newBase = SKSpriteNode(imageNamed: spriteName)
-                basesOnDna.remove(at: basesOnDna.index(of: base)!)
+//                basesOnDna.remove(at: basesOnDna.index(of: base)!)
                 basesOnDna.append(newBase)
                 newBase.name = tonename
                 addChild(newBase)
