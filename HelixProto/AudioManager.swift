@@ -170,7 +170,7 @@ class AudioManager {
         // the base's name.
         for (_, base) in basesByParts {
             if let base = base {
-                var baseName = "tone1"
+                var baseName = base.name!
                 if let divider = base.name!.index(of: ".") {
                     baseName = String(base.name![..<divider])
                 }
@@ -192,10 +192,7 @@ class AudioManager {
         var index2 = 0
         for (_, base) in passiveBasesByParts {
             if let base = base {
-                var baseName = "tone1"
-                if let divider = base.name!.index(of: ".") {
-                    baseName = String(base.name![..<divider])
-                }
+                var baseName = base.name!
                 if baseName == "tone1" {
                     sequencer.tracks[4].add(noteNumber: 62, velocity: 127, position: AKDuration(beats: Double(index2)), duration: AKDuration(beats: finalBeatAmount - index2))
                 } else if baseName == "tone2" {

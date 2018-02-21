@@ -29,11 +29,15 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
     @IBAction func indexChanged(_ sender: Any) {
         switch segmentedControl.selectedSegmentIndex {
         case 0:
+            scene!.dnaMode = false
             scene!.changeSide(to: .left)
         case 1:
+            scene!.dnaMode = true
             scene!.twist()
             scene!.resizeBases()
-        case 2: scene!.changeSide(to: .right)
+        case 2:
+            scene!.dnaMode = false
+            scene!.changeSide(to: .right)
         default:
             return
         }
@@ -46,7 +50,7 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
     @IBAction func sendButton(_ sender: Any) {
         self.requestState = .requesting
         var requestType = ""
-        let alert = UIAlertController(title: "DNA Request", message: "Do you want to request the rhythm or the melody part?", preferredStyle: UIAlertControllerStyle.alert)
+        let alert = UIAlertController(title: "DNA Request", message: "What do you want to send?", preferredStyle: UIAlertControllerStyle.alert)
         alert.addAction(UIAlertAction(title: "Melody", style: UIAlertActionStyle.default, handler: {(alert: UIAlertAction!) in requestType = "melody"; self.sendSequence(requestType: "melody"); self.scene!.requestType = requestType}))
         alert.addAction(UIAlertAction(title: "Rhythm", style: UIAlertActionStyle.default, handler: {(alert: UIAlertAction!) in requestType = "rhythm"; self.sendSequence(requestType: "rhythm"); self.scene!.requestType = requestType}))
         self.present(alert, animated: true, completion: nil)
@@ -69,15 +73,10 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
     func sendSequence(requestType: String) {
         if mcSession.connectedPeers.count > 0 {
             do {
-                if requestState == .requesting {
-                    var array: [String] = []
-                    array.append(requestType)
-                    let requestType = NSKeyedArchiver.archivedData(withRootObject: array)
-                    try mcSession.send(requestType, toPeers: mcSession.connectedPeers, with: .reliable)
-                } else if requestState == .sending {
+
                     let newData = NSKeyedArchiver.archivedData(withRootObject: scene?.encodeBases(for: requestType))
                    try mcSession.send(newData, toPeers: mcSession.connectedPeers, with: .reliable)
-                }
+                
             } catch let error as NSError {
                 let ac = UIAlertController(title: "Send error", message: error.localizedDescription, preferredStyle: .alert)
                 ac.addAction(UIAlertAction(title: "OK", style: .default))
@@ -188,16 +187,10 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
     // IGNORE
     
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-        if requestState == .sending {
-            print("HELLOOOO")
-            let requestType = NSKeyedUnarchiver.unarchiveObject(with: data) as! Array<String>
-            sendSequence(requestType: requestType[0])
-  
-        } else if requestState == .requesting {
-            let array = NSKeyedUnarchiver.unarchiveObject(with: data) as! Array<(SKSpriteNode, SKSpriteNode?)>
+
+            let array = NSKeyedUnarchiver.unarchiveObject(with: data) as! Array<String>
             scene?.decodeBases(data: array)
-            requestState = .sending
-        }
+        
 
     }
     
