@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		071597DD203EBC7900E8749D /* jose_kick_loud.wav in Resources */ = {isa = PBXBuildFile; fileRef = 071597DA203EBC7900E8749D /* jose_kick_loud.wav */; };
+		071597DE203EBC7900E8749D /* jose_mid_loud.wav in Resources */ = {isa = PBXBuildFile; fileRef = 071597DB203EBC7900E8749D /* jose_mid_loud.wav */; };
+		071597DF203EBC7900E8749D /* jose_coffee_loud.wav in Resources */ = {isa = PBXBuildFile; fileRef = 071597DC203EBC7900E8749D /* jose_coffee_loud.wav */; };
+		071597E1203EBC7E00E8749D /* jose_high_loud.wav in Resources */ = {isa = PBXBuildFile; fileRef = 071597E0203EBC7E00E8749D /* jose_high_loud.wav */; };
+		071597E3203EBC8600E8749D /* jose_clap_loud.wav in Resources */ = {isa = PBXBuildFile; fileRef = 071597E2203EBC8600E8749D /* jose_clap_loud.wav */; };
 		0755DDFC20362EA2009A2B79 /* GameDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0755DDFB20362EA2009A2B79 /* GameDelegate.swift */; };
 		077FCA542030D11900C2B174 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077FCA532030D11900C2B174 /* AppDelegate.swift */; };
 		077FCA5A2030D11900C2B174 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 077FCA592030D11900C2B174 /* GameScene.swift */; };
@@ -72,6 +77,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		071597DA203EBC7900E8749D /* jose_kick_loud.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = jose_kick_loud.wav; sourceTree = "<group>"; };
+		071597DB203EBC7900E8749D /* jose_mid_loud.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = jose_mid_loud.wav; sourceTree = "<group>"; };
+		071597DC203EBC7900E8749D /* jose_coffee_loud.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = jose_coffee_loud.wav; sourceTree = "<group>"; };
+		071597E0203EBC7E00E8749D /* jose_high_loud.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = jose_high_loud.wav; sourceTree = "<group>"; };
+		071597E2203EBC8600E8749D /* jose_clap_loud.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = jose_clap_loud.wav; sourceTree = "<group>"; };
 		0755DDFB20362EA2009A2B79 /* GameDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameDelegate.swift; sourceTree = "<group>"; };
 		077FCA502030D11900C2B174 /* HelixProto.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HelixProto.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		077FCA532030D11900C2B174 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -227,6 +237,11 @@
 				07EDF3AC2030D3F2002DFD90 /* Bell.wav */,
 				07A04109203B91240066945A /* jose_kick.wav */,
 				07A0410F203B95410066945A /* jose_high.wav */,
+				071597DC203EBC7900E8749D /* jose_coffee_loud.wav */,
+				071597DA203EBC7900E8749D /* jose_kick_loud.wav */,
+				071597E2203EBC8600E8749D /* jose_clap_loud.wav */,
+				071597E0203EBC7E00E8749D /* jose_high_loud.wav */,
+				071597DB203EBC7900E8749D /* jose_mid_loud.wav */,
 				07A0410B203B94C10066945A /* jose_coffee.wav */,
 				07A04113203B96010066945A /* jose_clap.wav */,
 				07A04111203B959C0066945A /* jose_mid.wav */,
@@ -360,14 +375,19 @@
 				07A0410A203B91240066945A /* jose_kick.wav in Resources */,
 				07EDF3B02030D51D002DFD90 /* FM Piano.wav in Resources */,
 				077FCA5F2030D11900C2B174 /* Main.storyboard in Resources */,
+				071597DE203EBC7900E8749D /* jose_mid_loud.wav in Resources */,
 				077FCA612030D11900C2B174 /* Assets.xcassets in Resources */,
 				07A04114203B96020066945A /* jose_clap.wav in Resources */,
 				07A04112203B959C0066945A /* jose_mid.wav in Resources */,
 				07A04110203B95410066945A /* jose_high.wav in Resources */,
+				071597E1203EBC7E00E8749D /* jose_high_loud.wav in Resources */,
+				071597DD203EBC7900E8749D /* jose_kick_loud.wav in Resources */,
 				077FCA642030D11900C2B174 /* LaunchScreen.storyboard in Resources */,
 				07C101DD203378B4008776D7 /* cheeb-bd.wav in Resources */,
 				07EDF3A92030D3DA002DFD90 /* 4tracks.mid in Resources */,
+				071597E3203EBC8600E8749D /* jose_clap_loud.wav in Resources */,
 				07C101DF203378C5008776D7 /* cheeb-ch.wav in Resources */,
+				071597DF203EBC7900E8749D /* jose_coffee_loud.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

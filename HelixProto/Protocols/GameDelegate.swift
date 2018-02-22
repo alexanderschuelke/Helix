@@ -13,5 +13,6 @@ protocol GameDelegate {
     func triggerSendData()
     func swipeLeft()
     func swipeRight()
+    func unhideNavigator()
     
 }

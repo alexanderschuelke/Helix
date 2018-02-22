@@ -27,19 +27,19 @@ class AudioManager {
     private var sampler6 = AKMIDISampler()
     private var sampler7 = AKMIDISampler()
     private var sampler8 = AKMIDISampler()
-
+    
     public init() {
         
         // Load wav files into samplers
         do {
-            try sampler1.loadWav("cheeb-bd")
-            try sampler2.loadWav("cheeb-snr")
-            try sampler3.loadWav("cheeb-hat")
-            try sampler4.loadWav("cheeb-ch")
-            try sampler5.loadWav("cheeb-bd")
-            try sampler6.loadWav("cheeb-snr")
-            try sampler7.loadWav("cheeb-hat")
-            try sampler8.loadWav("cheeb-ch")
+            try sampler1.loadWav("jose_kick_loud")
+            try sampler2.loadWav("jose_mid_loud")
+            try sampler3.loadWav("jose_coffee_loud")
+            try sampler4.loadWav("jose_high_loud")
+            try sampler5.loadWav("jose_kick_loud")
+            try sampler6.loadWav("jose_mid_loud")
+            try sampler7.loadWav("jose_coffee_loud")
+            try sampler8.loadWav("jose_high_loud")
             
         } catch let error {
             print(error.localizedDescription)
@@ -73,7 +73,7 @@ class AudioManager {
         sequencer.tracks[5].setMIDIOutput(sampler6.midiIn)
         sequencer.tracks[6].setMIDIOutput(sampler7.midiIn)
         sequencer.tracks[7].setMIDIOutput(sampler8.midiIn)
-
+        
         sequencerPassive.tracks[0].setMIDIOutput(sampler5.midiIn)
         sequencerPassive.tracks[1].setMIDIOutput(sampler6.midiIn)
         sequencerPassive.tracks[2].setMIDIOutput(sampler7.midiIn)
@@ -122,7 +122,7 @@ class AudioManager {
                 passiveBasesByParts = array
             }
         }
-
+        
         
         guard let parts = delegate?.getParts() else {
             return
@@ -135,7 +135,7 @@ class AudioManager {
         for track in sequencerPassive.tracks {
             track.clear()
         }
-
+        
         
         let beatsAmountCurrent = checkBeatAmount(basesByParts: basesByParts, parts: parts)
         var passiveParts: [SKSpriteNode] = []
@@ -188,7 +188,7 @@ class AudioManager {
         }
         
         
-
+        
         var index2 = 0
         for (_, base) in passiveBasesByParts {
             if let base = base {
@@ -206,12 +206,12 @@ class AudioManager {
             index2 = index2 + 1
         }
         
-
+        
         
     }
     
     public func checkBeatAmount(basesByParts: [(SKSpriteNode, SKSpriteNode?)], parts: [SKSpriteNode]) -> Double {
-
+        
         
         var highestPosition = 0
         for (currentPart, base) in basesByParts {
@@ -259,6 +259,6 @@ class AudioManager {
             return
         }
     }
-
+    
     
 }

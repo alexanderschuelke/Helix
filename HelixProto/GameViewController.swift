@@ -12,14 +12,15 @@ import GameplayKit
 import MultipeerConnectivity
 
 class GameViewController: UIViewController, UINavigationControllerDelegate, MCBrowserViewControllerDelegate, MCSessionDelegate, GameDelegate {
-
+    
+    
     enum States {
         case requesting
         case sending
-
+        
     }
     
-
+    
     @IBOutlet weak var segmentedControl: UISegmentedControl!
     @IBOutlet weak var tempoLabel: UILabel!
     @IBOutlet weak var tempoStepper: UIStepper!
@@ -29,15 +30,31 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
     @IBAction func indexChanged(_ sender: Any) {
         switch segmentedControl.selectedSegmentIndex {
         case 0:
-            scene!.dnaMode = false
-            scene!.changeSide(to: .left)
+            
+            scene!.checkForLeftovers()
+            //            scene!.dnaMode = false
+            if scene!.currentSide != .left {
+                scene!.changeSide(to: .left)
+            }
+            
+            
         case 1:
+            self.hideNavigator()
+            scene!.playButton.playPressedAnimation()
+            scene!.playButton.name = "stopButton"
+            scene!.audioManager.play()
             scene!.dnaMode = true
             scene!.twist()
             scene!.resizeBases()
         case 2:
-            scene!.dnaMode = false
-            scene!.changeSide(to: .right)
+            
+            scene!.checkForLeftovers()
+            //            scene!.dnaMode = false
+            if scene!.currentSide != .right {
+                scene!.changeSide(to: .right)
+                
+            }
+            
         default:
             return
         }
@@ -47,20 +64,28 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
         showConnectionPrompt()
     }
     
+    func hideNavigator() {
+        self.navigationController!.navigationBar.isHidden = true
+    }
+    func unhideNavigator() {
+        self.navigationController!.navigationBar.isHidden = false
+    }
+    
     @IBAction func sendButton(_ sender: Any) {
         self.requestState = .requesting
         var requestType = ""
         let alert = UIAlertController(title: "DNA Request", message: "What do you want to send?", preferredStyle: UIAlertControllerStyle.alert)
         alert.addAction(UIAlertAction(title: "Melody", style: UIAlertActionStyle.default, handler: {(alert: UIAlertAction!) in requestType = "melody"; self.sendSequence(requestType: "melody"); self.scene!.requestType = requestType}))
         alert.addAction(UIAlertAction(title: "Rhythm", style: UIAlertActionStyle.default, handler: {(alert: UIAlertAction!) in requestType = "rhythm"; self.sendSequence(requestType: "rhythm"); self.scene!.requestType = requestType}))
+        alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.cancel, handler: nil))
         self.present(alert, animated: true, completion: nil)
         
     }
-
+    
     @IBAction func changeTempo(_ sender: Any) {
         scene?.audioManager.tempo = tempoStepper.value
         scene?.audioManager.sequencer.setTempo(scene!.audioManager.tempo)
-        tempoLabel.text = String(describing: scene!.audioManager.tempo)
+        tempoLabel.text = String(describing: scene!.audioManager.tempo / 4)
     }
     
     
@@ -73,9 +98,9 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
     func sendSequence(requestType: String) {
         if mcSession.connectedPeers.count > 0 {
             do {
-
-                    let newData = NSKeyedArchiver.archivedData(withRootObject: scene?.encodeBases(for: requestType))
-                   try mcSession.send(newData, toPeers: mcSession.connectedPeers, with: .reliable)
+                
+                let newData = NSKeyedArchiver.archivedData(withRootObject: scene?.encodeBases(for: requestType))
+                try mcSession.send(newData, toPeers: mcSession.connectedPeers, with: .reliable)
                 
             } catch let error as NSError {
                 let ac = UIAlertController(title: "Send error", message: error.localizedDescription, preferredStyle: .alert)
@@ -85,7 +110,7 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
         }
     }
     
-
+    
     func browserViewControllerDidFinish(_ browserViewController: MCBrowserViewController) {
         dismiss(animated: true)
     }
@@ -113,14 +138,14 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
         
         scene = GameScene(size:CGSize(width: 2048, height: 1536))
         let skView = self.view as! SKView
-        skView.showsFPS = true
-        skView.showsNodeCount = true
+        skView.showsFPS = false
+        skView.showsNodeCount = false
         skView.ignoresSiblingOrder = true
         if let scene = scene {
             scene.scaleMode = .aspectFill
             skView.presentScene(scene)
             scene.gameSceneDelegate = self
-            tempoLabel.text = String(scene.audioManager.tempo)
+            tempoLabel.text = String(scene.audioManager.tempo / 4)
             tempoStepper.value = scene.audioManager.tempo
         }
         
@@ -187,11 +212,11 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
     // IGNORE
     
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-
-            let array = NSKeyedUnarchiver.unarchiveObject(with: data) as! Array<String>
-            scene?.decodeBases(data: array)
         
-
+        let array = NSKeyedUnarchiver.unarchiveObject(with: data) as! Array<String>
+        scene?.decodeBases(data: array)
+        
+        
     }
     
     func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {
@@ -209,3 +234,4 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
     
     
 }
+

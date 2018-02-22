@@ -38,21 +38,22 @@ class GameScene: SKScene {
     private var leftBases: [Int:SKSpriteNode] = [:]
     private var leftBasesByParts: [(SKSpriteNode, SKSpriteNode?)] = []
     private var dancingRight: [(Int, SKSpriteNode?)] = []
+    private var dancingLeft: [(Int, SKSpriteNode?)] = []
     public let audioManager = AudioManager()
     
     // For dragging bases
     private let panRecognizer = UIPanGestureRecognizer()
-
+    
     // Currently moved base
     private var currentBase: SKSpriteNode?
     private var currentPart: SKSpriteNode?
     private var scrolling: Bool = false
     private var originalBasePosition: CGPoint?
-
+    
     private var selectionFrame: SelectionFrame?
-    private var playButton: SKSpriteNode = SKSpriteNode(imageNamed: "playButton")
+    public var playButton: SKSpriteNode = SKSpriteNode(imageNamed: "playbutton_new")
     private var currentSequencerPosition = -1
-    private var currentSide: side = side.left
+    public var currentSide: side = side.left
     private var opener = true
     private var blockScrolling = false
     private var maxTopPosition: CGFloat = 0
@@ -65,6 +66,7 @@ class GameScene: SKScene {
     private var timing = 0.0
     public var dnaMode = false
     public var requestType: String = "melody"
+    public var setFree = true
     override init(size: CGSize) {
         // Create the one side of the DNA string.
         for index in 0...11 {
@@ -87,7 +89,7 @@ class GameScene: SKScene {
         leftBases[1] = SKSpriteNode(imageNamed: "square_stride_orange")
         leftBases[2] = SKSpriteNode(imageNamed: "square_stride_light")
         leftBases[3] = SKSpriteNode(imageNamed: "square_stride_white")
-
+        
         rightBases[0] = SKSpriteNode(imageNamed: "square_stride_pink")
         rightBases[1] = SKSpriteNode(imageNamed: "square_stride_orange")
         rightBases[2] = SKSpriteNode(imageNamed: "square_stride_light")
@@ -117,32 +119,32 @@ class GameScene: SKScene {
         buildParts(side: .right)
         buildBases(side: .right)
         
-//        // Position the 4 bases
-//        for (index, base) in bases {
-//            addChild(base)
-//            base.anchorPoint = CGPoint(x: 0, y: 0.5)
-//            base.zPosition = 1
-//            base.name = "tone\(index+1)"
-//            let overallHeight = base.frame.size.height * CGFloat(bases.count)
-//            base.position = CGPoint(x: self.frame.size.width / 1.68, y: (self.frame.size.height / 2) + (overallHeight / 2) - (base.frame.size.height * 2 * CGFloat(index)))
-//        }
+        //        // Position the 4 bases
+        //        for (index, base) in bases {
+        //            addChild(base)
+        //            base.anchorPoint = CGPoint(x: 0, y: 0.5)
+        //            base.zPosition = 1
+        //            base.name = "tone\(index+1)"
+        //            let overallHeight = base.frame.size.height * CGFloat(bases.count)
+        //            base.position = CGPoint(x: self.frame.size.width / 1.68, y: (self.frame.size.height / 2) + (overallHeight / 2) - (base.frame.size.height * 2 * CGFloat(index)))
+        //        }
         
         playButton.name = "playButton"
         addChild(playButton)
         playButton.zPosition = 99
-        playButton.position = CGPoint(x: self.frame.size.width / 1.58, y: self.frame.size.height / 7.7)
+        playButton.position = CGPoint(x: self.frame.width / 2, y: self.frame.size.height / 7.7)
         playButton.scale(to: CGSize(width: playButton.size.width * CGFloat(1.5), height: playButton.size.height * CGFloat(1.5)))
         
         
         
         panRecognizer.addTarget(self, action: #selector(GameScene.drag(_:)))
         self.view!.addGestureRecognizer(panRecognizer)
-
+        
         audioManager.delegate = self
         changeSide(to: .left)
         showBars()
         opener = false
-//        decodeBases(data: ["", "tone1", "", "", "tone3", "", "", "tone4", "", "", "", ""])
+        //        decodeBases(data: ["", "tone1", "", "", "tone3", "", "", "tone4", "", "", "", ""])
         
         
         let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(GameScene.swipe(_:)))
@@ -161,7 +163,7 @@ class GameScene: SKScene {
                     part.position = CGPoint(x: self.frame.size.width / 2.8, y: self.frame.size.height - part.frame.size.height * 3)
                     maxTopPosition = part.position.y
                 } else {
-
+                    
                     part.position = CGPoint(x: self.frame.size.width / 2.8, y: parts[index-1].position.y - part.frame.size.height * 1.5)
                 }
                 addChild(part)
@@ -186,7 +188,7 @@ class GameScene: SKScene {
             }
         }
         print(result)
- 
+        
     }
     
     func buildBases(side: side) {
@@ -218,33 +220,77 @@ class GameScene: SKScene {
     
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
-//                printBasesByParts()
+        //                printBasesByParts()
         let newSequencerPosition = audioManager.sequencer.currentRelativePosition.beats.isNaN ? 1 : Int(audioManager.sequencer.currentRelativePosition.beats)
         
-  
-
+        
+        
         if currentSequencerPosition != newSequencerPosition && audioManager.sequencer.isPlaying {
             currentSequencerPosition = newSequencerPosition
             audioManager.updateLoop()
             highlightBase()
             showBars()
-
+            
         }
-
+        
         timing += 0.01
         if audioManager.sequencer.isPlaying && dnaMode{
-            for (index, value) in dancingRight.enumerated() {
-                if let base = value.1 {
-                    base.position.x = rightParts[index].position.x
+            if currentSide == .left {
+                for (index, value) in dancingRight {
+                    if index < rightParts.count {
+                        if let base = value {
+                            base.position.x = rightParts[index].position.x
+                        }
+                    }
+                    
+                }
+                for (index, value) in BasesByParts.enumerated() {
+                    if let base = value.1 {
+                        base.position.x = leftParts[index].position.x - (base.frame.width / 24)
+                    }
+                }
+            } else {
+                for (index, value) in dancingLeft {
+                    if index < leftParts.count {
+                        if let base = value {
+                            base.position.x = leftParts[index].position.x
+                        }
+                    }
+                    
+                }
+                for (index, value) in BasesByParts.enumerated() {
+                    if let base = value.1 {
+                        base.position.x = rightParts[index].position.x - (base.frame.width / 24)
+                    }
                 }
             }
-            for (index, value) in BasesByParts.enumerated() {
-                if let base = value.1 {
-                    base.position.x = leftParts[index].position.x - (base.frame.width / 24)
+            
+        }
+        
+    }
+    
+    public func alignParts() {
+        print("start align")
+        print(rightParts.count)
+        print(leftParts.count)
+        if currentSide == .left {
+            for (index, rightPart) in rightParts.enumerated() {
+                if index < leftParts.count {
+                    rightParts[index].position.y = leftParts[index].position.y
                 }
             }
         }
-       
+        for (index, value) in dancingRight {
+            if index < rightParts.count {
+                if let base = value {
+                    print("treffer")
+                    base.position.y = rightParts[index].position.y
+                }
+                else {
+                    print("-")
+                }
+            }
+        }
     }
     
     @objc func swipe(_ gesture: UISwipeGestureRecognizer) -> Void {
@@ -262,36 +308,36 @@ class GameScene: SKScene {
         if gestureRecognizer.state == .began || gestureRecognizer.state == .changed {
             
             let translation = gestureRecognizer.translation(in: self.view)
-
+            
             if scrolling && !dnaMode{
                 if !blockScrolling {
                     if parts.first!.position.y < maxTopPosition && translation.y > 0{
                         return
                     }
-                for part in parts.reversed() {
-                    part.position = CGPoint(x: part.position.x, y: part.position.y - translation.y*2)
-                    if part == parts.last! {
-                        if intersects(part) {
-                            let newPart = SKSpriteNode(imageNamed: "circle_orange")
-                            newPart.zPosition = 3
-                            newPart.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-                            newPart.alpha = 0.5
-                            parts.append(newPart)
-                            BasesByParts.append((newPart, nil))
-                            addChild(newPart)
-                            if currentSide == .left {
-                                newPart.position = CGPoint(x: self.frame.size.width / 2.8, y: part.position.y - part.frame.height * 1.5)
-                            } else {
-                                newPart.xScale = -1
-                                newPart.position = CGPoint(x: self.frame.size.width / 1.6, y: part.position.y - part.frame.height * 1.5)
+                    for part in parts.reversed() {
+                        part.position = CGPoint(x: part.position.x, y: part.position.y - translation.y*2)
+                        if part == parts.last! {
+                            if intersects(part) {
+                                let newPart = SKSpriteNode(imageNamed: "circle_orange")
+                                newPart.zPosition = 3
+                                newPart.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+                                newPart.alpha = 0.5
+                                parts.append(newPart)
+                                BasesByParts.append((newPart, nil))
+                                addChild(newPart)
+                                if currentSide == .left {
+                                    newPart.position = CGPoint(x: self.frame.size.width / 2.8, y: part.position.y - part.frame.height * 1.5)
+                                } else {
+                                    newPart.xScale = -1
+                                    newPart.position = CGPoint(x: self.frame.size.width / 1.6, y: part.position.y - part.frame.height * 1.5)
+                                }
+                                
                             }
-
                         }
                     }
-                }
-                for base in basesOnDna {
-                    base.position = CGPoint(x: base.position.x, y: base.position.y - translation.y * 2)
-                }
+                    for base in basesOnDna {
+                        base.position = CGPoint(x: base.position.x, y: base.position.y - translation.y * 2)
+                    }
                 }
                 gestureRecognizer.setTranslation(CGPoint.zero, in: self.view)
             }
@@ -322,7 +368,7 @@ class GameScene: SKScene {
         }
             // End of drag, decide wether to snap to the stride or return to original position
         else if gestureRecognizer.state == .ended {
-
+            
             if let currentBase = currentBase {
                 if checkIfDeleted(currentBase) {
                     return
@@ -347,16 +393,16 @@ class GameScene: SKScene {
                         let snap = SKAction.move(to: newPosition, duration: 0.1)
                         let sequence = SKAction.sequence([blockScroll, snap, enableScroll])
                         currentBase.run(sequence)
-
+                        
                         if !basesOnDna.contains(currentBase) {
-                        basesOnDna.append(currentBase)
+                            basesOnDna.append(currentBase)
                         }
                         for (index, tuple) in BasesByParts.enumerated() {
                             if tuple.0 == nearest {
                                 cleanOldParts(from: currentBase)
                                 BasesByParts[index] = (nearest, currentBase)
                                 showBars()
-//                                gameSceneDelegate?.triggerSendData()
+                                //                                gameSceneDelegate?.triggerSendData()
                             }
                         }
                         // Get next base of same type
@@ -421,14 +467,14 @@ class GameScene: SKScene {
     }
     
     func checkIfDeleted(_ base: SKSpriteNode) -> Bool{
-
+        
         if currentSide == .left {
             let oldAnchorPoint = base.anchorPoint
             base.anchorPoint = CGPoint(x: 0, y: base.anchorPoint.y)
             let leftMostPoint = base.position
             base.anchorPoint = oldAnchorPoint
             if (leftMostPoint.x < parts.first!.position.x - parts.first!.frame.size.width * 2 && basesOnDna.contains(base)) {
-
+                
                 cleanOldParts(from: base)
                 basesOnDna.remove(at: basesOnDna.index(of: base)!)
                 let leaveScreen = SKAction.moveTo(x: base.position.x - base.frame.size.width * 2, duration: 0.5)
@@ -439,7 +485,7 @@ class GameScene: SKScene {
                 base.run(sequence)
                 reloadSample(for: base)
                 showBars()
-//                gameSceneDelegate?.triggerSendData()
+                //                gameSceneDelegate?.triggerSendData()
                 return true
             }
         }
@@ -449,7 +495,7 @@ class GameScene: SKScene {
             let rightMostPoint = base.position
             base.anchorPoint = oldAnchorPoint
             if (rightMostPoint.x > parts.first!.position.x + parts.first!.frame.size.width * 2 && basesOnDna.contains(base)) {
-
+                
                 cleanOldParts(from: base)
                 basesOnDna.remove(at: basesOnDna.index(of: base)!)
                 let leaveScreen = SKAction.moveTo(x: self.frame.width, duration: 0.5)
@@ -460,7 +506,7 @@ class GameScene: SKScene {
                 base.run(sequence)
                 reloadSample(for: base)
                 showBars()
-//                gameSceneDelegate?.triggerSendData()
+                //                gameSceneDelegate?.triggerSendData()
                 return true
             }
         }
@@ -470,7 +516,7 @@ class GameScene: SKScene {
     // In this method it is set which base the user wants to move right now,
     // which means to set 'currentBase', so the drag method can work properly.
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-
+        
         for touch in touches {
             let location = touch.location(in: self)
             let nodes = self.nodes(at: location)
@@ -487,9 +533,15 @@ class GameScene: SKScene {
                         audioManager.play()
                     }
                     else if name == "stopButton"{
-
+                        
                         node.playPressedAnimation()
                         node.name = "playButton"
+                        if dnaMode {
+                            
+                            stopAnimation()
+                            
+                        }
+                        gameSceneDelegate?.unhideNavigator()
                         audioManager.stop()
                     }
                     else if name == "background" || parts.contains(node){
@@ -500,7 +552,7 @@ class GameScene: SKScene {
                 }
                 if bases.values.contains(node) || basesOnDna.contains(node){
                     if let name = node.name {
-                            audioManager.playSample(baseName: name)
+                        audioManager.playSample(baseName: name)
                     }
                     originalBasePosition = node.position
                     currentBase = node
@@ -537,7 +589,7 @@ class GameScene: SKScene {
             let position = bases.keys[index]
             bases.removeValue(forKey: position)
             var newBase: SKSpriteNode
-            print(position)
+            
             switch position {
             case 0:
                 newBase = SKSpriteNode(imageNamed: "square_stride_pink")
@@ -565,7 +617,7 @@ class GameScene: SKScene {
                 newBase.position = CGPoint(x: self.frame.minX, y: (self.frame.size.height / 2) + (overallHeight / 2) - (newBase.frame.size.height * 3 * CGFloat(position)))
                 finalPos = CGPoint(x: self.frame.size.width / 3.88, y: (self.frame.size.height / 2) + (overallHeight / 2) - (newBase.frame.size.height * 3 * CGFloat(position)))
             }
-
+            
             let appear = SKAction.move(to: finalPos, duration: 0.5)
             newBase.run(appear)
         }
@@ -583,7 +635,7 @@ class GameScene: SKScene {
         var newSequencerPosition = audioManager.sequencer.currentRelativePosition.beats.isNaN ? 0 :  Int(audioManager.sequencer.currentRelativePosition.beats)
         
         let currentPart = parts[newSequencerPosition]
-
+        
         for (part, base) in BasesByParts {
             if part == currentPart {
                 if let base = base {
@@ -601,9 +653,9 @@ class GameScene: SKScene {
     func showBars() {
         
         audioManager.beatsAmount = audioManager.checkBeatAmount(basesByParts: BasesByParts, parts: parts)
-      
+        
         let bars = audioManager.beatsAmount
-
+        
         for (index, part) in parts.enumerated() {
             if index+1 > Int(bars) {
                 part.alpha = 0.5
@@ -668,23 +720,23 @@ class GameScene: SKScene {
                 return result
             }
         }
-//        else {
-//            if currentSide == .left {
-//                return rightBasesByParts
-//            } else {
-//                return BasesByParts
-//            }
+        //        else {
+        //            if currentSide == .left {
+        //                return rightBasesByParts
+        //            } else {
+        //                return BasesByParts
+        //            }
         //
         return [""]
     }
     
     func decodeBases(data: [String]) {
-        print(data)
+        
         var comingFrom = data[0]
         if comingFrom == "melody" {
             if currentSide == .left {
                 for (index, value) in BasesByParts.enumerated() {
-
+                    
                     if let base = value.1 {
                         BasesByParts[index] = (BasesByParts[index].0, nil)
                         base.removeFromParent()
@@ -721,11 +773,11 @@ class GameScene: SKScene {
                     newBase.position = CGPoint(x: leftParts[index].position.x - newBase.frame.width / 24, y: leftParts[index-1].position.y)
                     addChild(newBase)
                     basesOnDna.append(newBase)
-                    print(BasesByParts.count)
                     if index < BasesByParts.count {
-                    BasesByParts[index-1] = (BasesByParts[index-1].0, newBase)
+                        BasesByParts[index-1] = (BasesByParts[index-1].0, newBase)
                     }
                 }
+                showBars()
             }
             else if currentSide == .right {
                 for (index, value) in leftBasesByParts.enumerated() {
@@ -733,7 +785,7 @@ class GameScene: SKScene {
                         BasesByParts[index] = (BasesByParts[index].0, nil)
                     }
                 }
-
+                
                 for (index, name) in data.enumerated() {
                     if index == 0 {
                         continue
@@ -757,33 +809,34 @@ class GameScene: SKScene {
                         spriteName = "square_stride_pink"
                     }
                     let newBase = SKSpriteNode(imageNamed: spriteName)
-//                    newBase.anchorPoint = CGPoint(x: 1, y: 0.5)
-//                    newBase.zPosition = 1
+                    //                    newBase.anchorPoint = CGPoint(x: 1, y: 0.5)
+                    //                    newBase.zPosition = 1
                     newBase.name = name
-//                    newBase.position = CGPoint(x: rightParts[index].position.x + newBase.frame.width / 24, y: rightParts[index].position.y)
+                    //                    newBase.position = CGPoint(x: rightParts[index].position.x + newBase.frame.width / 24, y: rightParts[index].position.y)
                     addChild(newBase)
-//                    basesOnDna.append(newBase)
-//                    print(BasesByParts.count)
+                    //                    basesOnDna.append(newBase)
+                    //                    print(BasesByParts.count)
                     if index < BasesByParts.count {
                         leftBasesByParts[index-1] = (leftBasesByParts[index-1].0, newBase)
                     }
                 }
+                showBars()
             }
-//            else {
-//                leftBasesByParts = data
-//            }
-//        }
-//        else {
-//            if currentSide == .left {
-//                rightBasesByParts = data
-//            } else {
-//                BasesByParts = data
-//            }
-//        }
+            //            else {
+            //                leftBasesByParts = data
+            //            }
+            //        }
+            //        else {
+            //            if currentSide == .left {
+            //                rightBasesByParts = data
+            //            } else {
+            //                BasesByParts = data
+            //            }
+            //        }
         } else {
             if currentSide == .right {
                 for (index, value) in BasesByParts.enumerated() {
-
+                    
                     if let base = value.1 {
                         BasesByParts[index] = (BasesByParts[index].0, nil)
                         base.removeFromParent()
@@ -797,7 +850,7 @@ class GameScene: SKScene {
                     if name == "" {
                         continue
                     }
-             
+                    
                     let currentName = name
                     var spriteName = ""
                     switch currentName {
@@ -819,11 +872,12 @@ class GameScene: SKScene {
                     newBase.position = CGPoint(x: rightParts[index].position.x + newBase.frame.width / 24, y: rightParts[index-1].position.y)
                     addChild(newBase)
                     basesOnDna.append(newBase)
-                    print(BasesByParts.count)
+                    
                     if index < BasesByParts.count {
                         BasesByParts[index-1] = (BasesByParts[index-1].0, newBase)
                     }
                 }
+                showBars()
             }
             else if currentSide == .left {
                 for (index, value) in rightBasesByParts.enumerated() {
@@ -855,22 +909,23 @@ class GameScene: SKScene {
                     }
                     let newBase = SKSpriteNode(imageNamed: spriteName)
                     newBase.anchorPoint = CGPoint(x: 1, y: 0.5)
-//                    newBase.zPosition = 1
+                    //                    newBase.zPosition = 1
                     newBase.name = name
-//                    newBase.position = CGPoint(x: rightParts[index].position.x + newBase.frame.width / 24, y: rightParts[index].position.y)
-//                    addChild(newBase)
-//                    basesOnDna.append(newBase)
-//                    print(BasesByParts.count)
+                    //                    newBase.position = CGPoint(x: rightParts[index].position.x + newBase.frame.width / 24, y: rightParts[index].position.y)
+                    //                    addChild(newBase)
+                    //                    basesOnDna.append(newBase)
+                    //                    print(BasesByParts.count)
                     if index < rightBasesByParts.count {
                         rightBasesByParts[index-1] = (rightBasesByParts[index-1].0, newBase)
                     }
                 }
+                showBars()
             }
         }
-        }
+    }
     
     public func changeSide(to side: side) {
-
+        
         self.removeAllChildren()
         self.addChild(background)
         self.addChild(self.playButton)
@@ -884,7 +939,7 @@ class GameScene: SKScene {
             }
             
             BasesByParts = leftBasesByParts
-//            kickBases()
+            //            kickBases()
             buildParts(side: .left)
             buildBases(side: .left)
             restorePositions(side: .left)
@@ -895,14 +950,14 @@ class GameScene: SKScene {
             bases = rightBases
             leftBasesByParts = BasesByParts
             BasesByParts = rightBasesByParts
-//            kickBases()
+            //            kickBases()
             buildParts(side: .right)
             buildBases(side: .right)
             restorePositions(side: .right)
             showBars()
         }
-//        gameSceneDelegate?.triggerSendData()
-
+        //        gameSceneDelegate?.triggerSendData()
+        
     }
     
     public func kickBases() {
@@ -913,33 +968,33 @@ class GameScene: SKScene {
                 print("base from baseparts")
                 if let name = base.name {
                     print("name of base \(name)")
-                        if let divider2 = name.index(of: ".") {
-                            let ownID = String(name[divider2...])
-                            print(ownID)
-                            var exists = false
-                            var firstBase: SKSpriteNode
-                            var firstTiming = 0.0
-                            for (index, value) in basesByIDs.enumerated() {
-                                let id = value.0
-                                if id == ownID && !exists {
-                                    print("first found!")
-                                    exists = true
-                                    firstBase = value.1.0
-                                    firstTiming = value.1.1
-                                } else if id == ownID && exists {
-                                    print("second found!")
-                                    let secondBase = value.1.0
-                                    let secondTiming = value.1.1
-                                    if firstTiming < secondTiming {
-                                        print("first shorter")
-                                        BasesByParts[index] = (BasesByParts[index].0, nil)
-                                        base.removeFromParent()
-                                        print("TRIUMPH")
-                                    }
+                    if let divider2 = name.index(of: ".") {
+                        let ownID = String(name[divider2...])
+                        print(ownID)
+                        var exists = false
+                        var firstBase: SKSpriteNode
+                        var firstTiming = 0.0
+                        for (index, value) in basesByIDs.enumerated() {
+                            let id = value.0
+                            if id == ownID && !exists {
+                                print("first found!")
+                                exists = true
+                                firstBase = value.1.0
+                                firstTiming = value.1.1
+                            } else if id == ownID && exists {
+                                print("second found!")
+                                let secondBase = value.1.0
+                                let secondTiming = value.1.1
+                                if firstTiming < secondTiming {
+                                    print("first shorter")
+                                    BasesByParts[index] = (BasesByParts[index].0, nil)
+                                    base.removeFromParent()
+                                    print("TRIUMPH")
                                 }
                             }
                         }
                     }
+                }
             }
         }
     }
@@ -962,18 +1017,18 @@ class GameScene: SKScene {
                 var tonename = "tone1"
                 if let name = base.name {
                     
-
-  
+                    
+                    
                     switch name {
-                        case "tone1":
+                    case "tone1":
                         spriteName = "square_stride_pink"
-                        case "tone2":
+                    case "tone2":
                         spriteName = "square_stride_orange"
-                        case "tone3":
+                    case "tone3":
                         spriteName = "square_stride_light"
-                        case "tone4":
+                    case "tone4":
                         spriteName = "square_stride_white"
-                        default:
+                    default:
                         spriteName = "square_stride_pink"
                     }
                     tonename = name
@@ -987,7 +1042,7 @@ class GameScene: SKScene {
                 addChild(newBase)
                 newBase.anchorPoint = CGPoint(x: 0, y: 0.5)
                 newBase.zPosition = 1
-
+                
                 BasesByParts[index] = (tuple.0, newBase)
                 if side == .left {
                     newBase.position = CGPoint(x: tuple.0.position.x + newBase.frame.width / 24, y: tuple.0.position.y)
@@ -1003,8 +1058,11 @@ class GameScene: SKScene {
     public func twist() {
         removeSelection(side: currentSide)
         getOtherSide(side: currentSide)
-        
+        alignParts()
         if currentSide == .left {
+            for part in leftParts {
+                part.alpha = 1
+            }
             for (index, part) in leftParts.enumerated() {
                 let waitFirst = SKAction.wait(forDuration: 1.2)
                 let wait = SKAction.wait(forDuration: Double(index) / Double(6))
@@ -1044,6 +1102,9 @@ class GameScene: SKScene {
             }
         }
         else {
+            for part in rightParts {
+                part.alpha = 1
+            }
             for (index, part) in leftParts.enumerated() {
                 let waitFirst = SKAction.wait(forDuration: 1.2)
                 let wait = SKAction.wait(forDuration: Double(index) / Double(6))
@@ -1085,99 +1146,151 @@ class GameScene: SKScene {
     }
     
     func resizeBases() {
-        for (index, value) in BasesByParts.enumerated() {
-            if let base = value.1 {
-                let waitFirst = SKAction.wait(forDuration: 1.2)
-                let wait = SKAction.wait(forDuration: Double(index) / Double(6))
-                let setAnchorLeft = SKAction.run {
-                    base.anchorPoint = CGPoint(x: 0, y: 0.5)
+        if currentSide == .left {
+            for (index, value) in BasesByParts.enumerated() {
+                if let base = value.1 {
+                    let waitFirst = SKAction.wait(forDuration: 1.2)
+                    let wait = SKAction.wait(forDuration: Double(index) / Double(6))
+                    let setAnchorLeft = SKAction.run {
+                        base.anchorPoint = CGPoint(x: 0, y: 0.5)
+                    }
+                    //                    let shrink = SKAction.scaleX(to: 0, duration: 0.5)
+                    let setAnchorRight = SKAction.run {
+                        base.anchorPoint = CGPoint(x: 1, y: 0.5)
+                    }
+                    //                    let grow = SKAction.scaleX(to: 1, duration: 0.5)
+                    //
+                    //                    let sequence = SKAction.sequence([setAnchorLeft, shrink, setAnchorRight, grow, shrink, setAnchorLeft, grow])
+                    let shrink = SKAction.scaleX(to: 0, duration: 0.5)
+                    shrink.timingMode = .linear
+                    let grow = SKAction.scaleX(to: 1, duration: 0.5)
+                    grow.timingMode = .linear
+                    let sequence = SKAction.sequence([setAnchorLeft, shrink, setAnchorRight, grow, shrink, setAnchorLeft, grow])
+                    let repeatSequence = SKAction.repeatForever(sequence)
+                    let finalSequence = SKAction.sequence([waitFirst, wait, repeatSequence])
+                    base.run(finalSequence)
                 }
-                //                    let shrink = SKAction.scaleX(to: 0, duration: 0.5)
-                let setAnchorRight = SKAction.run {
-                    base.anchorPoint = CGPoint(x: 1, y: 0.5)
+            }
+            for (index, value) in dancingRight {
+                if let base = value {
+                    let waitFirst = SKAction.wait(forDuration: 1.2)
+                    let wait = SKAction.wait(forDuration: Double(index) / Double(6))
+                    let setAnchorLeft = SKAction.run {
+                        base.anchorPoint = CGPoint(x: 0, y: 0.5)
+                    }
+                    //                    let shrink = SKAction.scaleX(to: 0, duration: 0.5)
+                    let setAnchorRight = SKAction.run {
+                        base.anchorPoint = CGPoint(x: 1, y: 0.5)
+                    }
+                    //                    let grow = SKAction.scaleX(to: 1, duration: 0.5)
+                    //
+                    //                    let sequence = SKAction.sequence([setAnchorLeft, shrink, setAnchorRight, grow, shrink, setAnchorLeft, grow])
+                    let shrink = SKAction.scaleX(to: 0, duration: 0.5)
+                    shrink.timingMode = .linear
+                    let grow = SKAction.scaleX(to: 1, duration: 0.5)
+                    grow.timingMode = .linear
+                    let sequence = SKAction.sequence([setAnchorRight, shrink, setAnchorLeft, grow, shrink, setAnchorRight, grow])
+                    let repeatSequence = SKAction.repeatForever(sequence)
+                    let finalSequence = SKAction.sequence([waitFirst, wait, repeatSequence])
+                    base.run(finalSequence)
                 }
-                //                    let grow = SKAction.scaleX(to: 1, duration: 0.5)
-                //
-                //                    let sequence = SKAction.sequence([setAnchorLeft, shrink, setAnchorRight, grow, shrink, setAnchorLeft, grow])
-                let shrink = SKAction.scaleX(to: 0, duration: 0.5)
-                shrink.timingMode = .easeInEaseOut
-                let grow = SKAction.scaleX(to: 1, duration: 0.5)
-                grow.timingMode = .easeInEaseOut
-                let sequence = SKAction.sequence([setAnchorLeft, shrink, setAnchorRight, grow, shrink, setAnchorLeft, grow])
-                let repeatSequence = SKAction.repeatForever(sequence)
-                let finalSequence = SKAction.sequence([waitFirst, wait, repeatSequence])
-                base.run(finalSequence)
+            }
+        } else {
+            for (index, value) in BasesByParts.enumerated() {
+                if let base = value.1 {
+                    let waitFirst = SKAction.wait(forDuration: 1.2)
+                    let wait = SKAction.wait(forDuration: Double(index) / Double(6))
+                    let setAnchorLeft = SKAction.run {
+                        base.anchorPoint = CGPoint(x: 1, y: 0.5)
+                    }
+                    //                    let shrink = SKAction.scaleX(to: 0, duration: 0.5)
+                    let setAnchorRight = SKAction.run {
+                        base.anchorPoint = CGPoint(x: 0, y: 0.5)
+                    }
+                    //                    let grow = SKAction.scaleX(to: 1, duration: 0.5)
+                    //
+                    //                    let sequence = SKAction.sequence([setAnchorLeft, shrink, setAnchorRight, grow, shrink, setAnchorLeft, grow])
+                    let shrink = SKAction.scaleX(to: 0, duration: 0.5)
+                    shrink.timingMode = .linear
+                    let grow = SKAction.scaleX(to: 1.2, duration: 0.5)
+                    grow.timingMode = .linear
+                    let sequence = SKAction.sequence([setAnchorLeft, shrink, setAnchorRight, grow, shrink, setAnchorLeft, grow])
+                    let repeatSequence = SKAction.repeatForever(sequence)
+                    let finalSequence = SKAction.sequence([waitFirst, wait, repeatSequence])
+                    base.run(finalSequence)
+                }
+            }
+            for (index, value) in dancingLeft {
+                if let base = value {
+                    let waitFirst = SKAction.wait(forDuration: 1.2)
+                    let wait = SKAction.wait(forDuration: Double(index) / Double(6))
+                    let setAnchorLeft = SKAction.run {
+                        base.anchorPoint = CGPoint(x: 1, y: 0.5)
+                    }
+                    //                    let shrink = SKAction.scaleX(to: 0, duration: 0.5)
+                    let setAnchorRight = SKAction.run {
+                        base.anchorPoint = CGPoint(x: 0, y: 0.5)
+                    }
+                    //                    let grow = SKAction.scaleX(to: 1, duration: 0.5)
+                    //
+                    //                    let sequence = SKAction.sequence([setAnchorLeft, shrink, setAnchorRight, grow, shrink, setAnchorLeft, grow])
+                    let shrink = SKAction.scaleX(to: 0, duration: 0.5)
+                    shrink.timingMode = .linear
+                    let grow = SKAction.scaleX(to: 1.2, duration: 0.5)
+                    grow.timingMode = .linear
+                    let sequence = SKAction.sequence([setAnchorRight, shrink, setAnchorLeft, grow, shrink, setAnchorRight, grow])
+                    let repeatSequence = SKAction.repeatForever(sequence)
+                    let finalSequence = SKAction.sequence([waitFirst, wait, repeatSequence])
+                    base.run(finalSequence)
+                }
             }
         }
-        for (index, value) in dancingRight.enumerated() {
-            if let base = value.1 {
-                let waitFirst = SKAction.wait(forDuration: 1.2)
-                let wait = SKAction.wait(forDuration: Double(index) / Double(6))
-                let setAnchorLeft = SKAction.run {
-                    base.anchorPoint = CGPoint(x: 0, y: 0.5)
-                }
-                //                    let shrink = SKAction.scaleX(to: 0, duration: 0.5)
-                let setAnchorRight = SKAction.run {
-                    base.anchorPoint = CGPoint(x: 1, y: 0.5)
-                }
-                //                    let grow = SKAction.scaleX(to: 1, duration: 0.5)
-                //
-                //                    let sequence = SKAction.sequence([setAnchorLeft, shrink, setAnchorRight, grow, shrink, setAnchorLeft, grow])
-                let shrink = SKAction.scaleX(to: 0, duration: 0.5)
-                shrink.timingMode = .easeInEaseOut
-                let grow = SKAction.scaleX(to: 1, duration: 0.5)
-                grow.timingMode = .easeInEaseOut
-                let sequence = SKAction.sequence([setAnchorRight, shrink, setAnchorLeft, grow, shrink, setAnchorRight, grow])
-                let repeatSequence = SKAction.repeatForever(sequence)
-                let finalSequence = SKAction.sequence([waitFirst, wait, repeatSequence])
-                base.run(finalSequence)
-            }
-        }
-        //        for (index, value) in leftBasesByParts.enumerated() {
-        //            let wait = SKAction.wait(forDuration: Double(index) / Double(6))
-        //            if let currentBase = value.1 {
-        //                let setAnchorLeft = SKAction.run {
-        //                    print("setAnchor")
-        //                    currentBase.anchorPoint = CGPoint(x: 0, y: 0.5)
-        //                }
-        //                let shrink = SKAction.scaleX(to: 0, duration: 0.5)
-        //                let setAnchorRight = SKAction.run {
-        //                    print("setAnchor")
-        //                    currentBase.anchorPoint = CGPoint(x: 1, y: 0.5)
-        //                }
-        //                let grow = SKAction.scaleX(to: 1, duration: 0.5)
-        //
-        //                let sequence = SKAction.sequence([setAnchorRight, shrink, setAnchorLeft, grow, shrink, setAnchorRight, grow])
-        //                //                let reversed = sequence.reversed()
-        //                let repeatSequence = SKAction.repeatForever(sequence)
-        //                let finalSequence = SKAction.sequence([wait, repeatSequence])
-        //                currentBase.run(finalSequence)
-        //            }
-        //        }
-        //
-        //        for (index, value) in rightBasesByParts.enumerated() {
-        //            let wait = SKAction.wait(forDuration: Double(index) / Double(6))
-        //            if let currentBase = value.1 {
-        //                let setAnchorLeft = SKAction.run {
-        //                    print("setAnchor")
-        //                    currentBase.anchorPoint = CGPoint(x: 0, y: 0.5)
-        //                }
-        //                let shrink = SKAction.scaleX(to: 0, duration: 0.5)
-        //                let setAnchorRight = SKAction.run {
-        //                    print("setAnchor")
-        //                    currentBase.anchorPoint = CGPoint(x: 1, y: 0.5)
-        //                }
-        //                let grow = SKAction.scaleX(to: 1, duration: 0.5)
-        //
-        //                let sequence = SKAction.sequence([setAnchorLeft, shrink, setAnchorRight, grow, shrink, setAnchorLeft, grow])
-        //                //                let reversed = sequence.reversed()
-        //                let repeatSequence = SKAction.repeatForever(sequence)
-        //                let finalSequence = SKAction.sequence([wait, repeatSequence])
-        //                currentBase.run(finalSequence)
-        //            }
-        //        }
-        
     }
+    
+    //        for (index, value) in leftBasesByParts.enumerated() {
+    //            let wait = SKAction.wait(forDuration: Double(index) / Double(6))
+    //            if let currentBase = value.1 {
+    //                let setAnchorLeft = SKAction.run {
+    //                    print("setAnchor")
+    //                    currentBase.anchorPoint = CGPoint(x: 0, y: 0.5)
+    //                }
+    //                let shrink = SKAction.scaleX(to: 0, duration: 0.5)
+    //                let setAnchorRight = SKAction.run {
+    //                    print("setAnchor")
+    //                    currentBase.anchorPoint = CGPoint(x: 1, y: 0.5)
+    //                }
+    //                let grow = SKAction.scaleX(to: 1, duration: 0.5)
+    //
+    //                let sequence = SKAction.sequence([setAnchorRight, shrink, setAnchorLeft, grow, shrink, setAnchorRight, grow])
+    //                //                let reversed = sequence.reversed()
+    //                let repeatSequence = SKAction.repeatForever(sequence)
+    //                let finalSequence = SKAction.sequence([wait, repeatSequence])
+    //                currentBase.run(finalSequence)
+    //            }
+    //        }
+    //
+    //        for (index, value) in rightBasesByParts.enumerated() {
+    //            let wait = SKAction.wait(forDuration: Double(index) / Double(6))
+    //            if let currentBase = value.1 {
+    //                let setAnchorLeft = SKAction.run {
+    //                    print("setAnchor")
+    //                    currentBase.anchorPoint = CGPoint(x: 0, y: 0.5)
+    //                }
+    //                let shrink = SKAction.scaleX(to: 0, duration: 0.5)
+    //                let setAnchorRight = SKAction.run {
+    //                    print("setAnchor")
+    //                    currentBase.anchorPoint = CGPoint(x: 1, y: 0.5)
+    //                }
+    //                let grow = SKAction.scaleX(to: 1, duration: 0.5)
+    //
+    //                let sequence = SKAction.sequence([setAnchorLeft, shrink, setAnchorRight, grow, shrink, setAnchorLeft, grow])
+    //                //                let reversed = sequence.reversed()
+    //                let repeatSequence = SKAction.repeatForever(sequence)
+    //                let finalSequence = SKAction.sequence([wait, repeatSequence])
+    //                currentBase.run(finalSequence)
+    //            }
+    //        }
+    
     
     private func removeSelection(side: side) {
         if side == .left {
@@ -1286,7 +1399,7 @@ class GameScene: SKScene {
                     newBase.name = tonename
                     addChild(newBase)
                     newBase.zPosition = 1
-                    
+                    dancingLeft.append((index, newBase))
                     let wait = SKAction.wait(forDuration: 0.4)
                     newBase.anchorPoint = CGPoint(x: 0, y: 0.5)
                     newBase.position = CGPoint(x: 0, y: tuple.0.position.y)
@@ -1296,6 +1409,126 @@ class GameScene: SKScene {
                     newBase.run(sequence)
                     
                 }
+            }
+        }
+    }
+    
+    func stopAnimation() {
+        if currentSide == .left {
+            for (index, value) in BasesByParts.enumerated() {
+                value.0.removeAllActions()
+                let moveBack = SKAction.moveTo(x: self.frame.width / 2.8, duration: 1)
+                moveBack.timingMode = .easeInEaseOut
+                value.0.run(moveBack)
+                if let base = value.1 {
+                    base.anchorPoint = CGPoint(x: 0, y: 0.5)
+                    let rescale = SKAction.scaleX(to: 1, duration: 0.5)
+                    base.removeAllActions()
+                    let move = SKAction.moveTo(x: self.frame.width / 2.8  - base.frame.width / 24, duration: 1)
+                    let group = SKAction.group([rescale, move])
+                    group.timingMode = .easeInEaseOut
+                    base.run(group)
+                }
+            }
+            
+            for (index, base) in dancingRight {
+                if let base = base {
+                    base.anchorPoint = CGPoint(x: 1, y: 0.5)
+                    let rescale = SKAction.scaleX(to: 1, duration: 0.5)
+                    let moveBack = SKAction.moveTo(x: self.frame.width / 1.6 + base.frame.width / 24, duration: 1)
+                    let group = SKAction.group([rescale, moveBack])
+                    group.timingMode = .easeInEaseOut
+                    base.removeAllActions()
+                    base.run(group)
+                    if let index = basesOnDna.index(of: base) {
+                        basesOnDna.remove(at: index)
+                    }
+                    
+                }
+            }
+            
+            for part in rightParts {
+                part.removeAllActions()
+                let moveBack = SKAction.moveTo(x: self.frame.width / 1.6, duration: 1)
+                moveBack.timingMode = .easeInEaseOut
+                part.run(moveBack)
+                
+            }
+        } else {
+            for (index, value) in BasesByParts.enumerated() {
+                value.0.removeAllActions()
+                let moveBack = SKAction.moveTo(x: self.frame.width / 1.6, duration: 1)
+                moveBack.timingMode = .easeInEaseOut
+                value.0.run(moveBack)
+                if let base = value.1 {
+                    base.anchorPoint = CGPoint(x: 1, y: 0.5)
+                    let rescale = SKAction.scaleX(to: 1, duration: 0.5)
+                    base.removeAllActions()
+                    let move = SKAction.moveTo(x: self.frame.width / 1.6  + base.frame.width / 24, duration: 1)
+                    let group = SKAction.group([rescale, move])
+                    group.timingMode = .easeInEaseOut
+                    base.run(group)
+                }
+            }
+            
+            for (index, base) in dancingLeft {
+                if let base = base {
+                    base.anchorPoint = CGPoint(x: 0, y: 0.5)
+                    let rescale = SKAction.scaleX(to: 1, duration: 0.5)
+                    let moveBack = SKAction.moveTo(x: self.frame.width / 2.8 - base.frame.width / 24, duration: 1)
+                    let group = SKAction.group([rescale, moveBack])
+                    group.timingMode = .easeInEaseOut
+                    base.removeAllActions()
+                    base.run(group)
+                    if let index = basesOnDna.index(of: base) {
+                        basesOnDna.remove(at: index)
+                    }
+                    
+                }
+            }
+            
+            for part in leftParts {
+                part.removeAllActions()
+                let moveBack = SKAction.moveTo(x: self.frame.width / 2.8, duration: 1)
+                moveBack.timingMode = .easeInEaseOut
+                part.run(moveBack)
+                
+            }
+            
+        }
+        
+        
+        
+        
+    }
+    
+    func checkForLeftovers() {
+        
+        if dnaMode {
+            
+            dnaMode = false
+            
+            if currentSide == .left {
+                showBars()
+                for (index, base) in dancingRight {
+                    print("in")
+                    if let cbase = base {
+                        print("destroy")
+                        cbase.removeFromParent()
+                    }
+                }
+                dancingRight.removeAll()
+                setFree = true
+            }
+            else {
+                showBars()
+                for (index, base) in dancingLeft {
+                    if let cbase = base {
+                        cbase.removeFromParent()
+                    }
+                }
+                dancingLeft.removeAll()
+                setFree = true
             }
         }
     }
