@@ -26,10 +26,10 @@ extension SKSpriteNode {
         let scaleBack = SKAction.scale(to: CGSize(width: self.size.width * CGFloat(1.0), height: self.size.height * CGFloat(1.0)), duration: 0.1)
         let changeSprite: SKAction
         if name! == "playButton" {
-            changeSprite = SKAction.setTexture(SKTexture(imageNamed: "stopButton"))
+            changeSprite = SKAction.setTexture(SKTexture(imageNamed: "pausebutton"))
         }
         else {
-            changeSprite = SKAction.setTexture(SKTexture(imageNamed: "playButton"))
+            changeSprite = SKAction.setTexture(SKTexture(imageNamed: "playbutton_new"))
         }
         
         let sequence = SKAction.sequence([scale, scaleBack, changeSprite])
