@@ -36,6 +36,11 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
 //            }
             
             scene!.checkForLeftovers()
+            
+            if scene!.currentSide == .left {
+                scene!.changeSide(to: .right)
+                scene!.changeSide(to: .left)
+            }
             //            scene!.dnaMode = false
             if scene!.currentSide != .left {
                 scene!.changeSide(to: .left)
@@ -57,11 +62,14 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
             scene!.resizeBases()
         case 2:
             
-//            if scene!.currentSide == .right {
-//                scene!.changeSide(to: .right)
-//            }
+
             
             scene!.checkForLeftovers()
+            
+            if scene!.currentSide == .right {
+                scene!.changeSide(to: .left)
+                scene!.changeSide(to: .right)
+            }
             //            scene!.dnaMode = false
             if scene!.currentSide != .right {
                 scene!.changeSide(to: .right)
