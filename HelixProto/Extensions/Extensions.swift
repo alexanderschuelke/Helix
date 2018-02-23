@@ -21,15 +21,18 @@ extension SKSpriteNode {
     var id: Int { return Int(arc4random_uniform(1000000)) }
     
     // Simple press animation
-    public func playPressedAnimation() {
+    public func playPressedAnimation(_ isPlaying: Bool) {
         let scale = SKAction.scale(to: CGSize(width: self.size.width / CGFloat(1.2), height: self.size.height / CGFloat(1.2)), duration: 0.1)
         let scaleBack = SKAction.scale(to: CGSize(width: self.size.width * CGFloat(1.0), height: self.size.height * CGFloat(1.0)), duration: 0.1)
-        let changeSprite: SKAction
+        var changeSprite: SKAction = SKAction()
         if name! == "playButton" {
             changeSprite = SKAction.setTexture(SKTexture(imageNamed: "pausebutton"))
         }
-        else {
+        else if isPlaying {
             changeSprite = SKAction.setTexture(SKTexture(imageNamed: "playbutton_new"))
+        }
+        else if !isPlaying {
+            changeSprite = SKAction.setTexture(SKTexture(imageNamed: "pausebutton"))
         }
         
         let sequence = SKAction.sequence([scale, scaleBack, changeSprite])

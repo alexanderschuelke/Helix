@@ -31,6 +31,10 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
         switch segmentedControl.selectedSegmentIndex {
         case 0:
             
+            if scene!.currentSide == .left {
+                scene!.changeSide(to: .left)
+            }
+            
             scene!.checkForLeftovers()
             //            scene!.dnaMode = false
             if scene!.currentSide != .left {
@@ -40,13 +44,22 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
             
         case 1:
             self.hideNavigator()
-            scene!.playButton.playPressedAnimation()
+            if scene!.audioManager.sequencer.isPlaying {
+//                scene!.playButton.playPressedAnimation(true)
+            } else {
+                scene!.playButton.playPressedAnimation(false)
+            }
+
             scene!.playButton.name = "stopButton"
             scene!.audioManager.play()
             scene!.dnaMode = true
             scene!.twist()
             scene!.resizeBases()
         case 2:
+            
+            if scene!.currentSide == .right {
+                scene!.changeSide(to: .right)
+            }
             
             scene!.checkForLeftovers()
             //            scene!.dnaMode = false
@@ -74,7 +87,7 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
     @IBAction func sendButton(_ sender: Any) {
         self.requestState = .requesting
         var requestType = ""
-        let alert = UIAlertController(title: "DNA Request", message: "What do you want to send?", preferredStyle: UIAlertControllerStyle.alert)
+        let alert = UIAlertController(title: "DNA Replication", message: "What do you want to send?", preferredStyle: UIAlertControllerStyle.alert)
         alert.addAction(UIAlertAction(title: "Melody", style: UIAlertActionStyle.default, handler: {(alert: UIAlertAction!) in requestType = "melody"; self.sendSequence(requestType: "melody"); self.scene!.requestType = requestType}))
         alert.addAction(UIAlertAction(title: "Rhythm", style: UIAlertActionStyle.default, handler: {(alert: UIAlertAction!) in requestType = "rhythm"; self.sendSequence(requestType: "rhythm"); self.scene!.requestType = requestType}))
         alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.cancel, handler: nil))

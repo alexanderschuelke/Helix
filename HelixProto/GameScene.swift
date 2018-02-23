@@ -219,6 +219,7 @@ class GameScene: SKScene {
     }
     
     override func update(_ currentTime: TimeInterval) {
+        print(dnaMode)
         // Called before each frame is rendered
         //                printBasesByParts()
         let newSequencerPosition = audioManager.sequencer.currentRelativePosition.beats.isNaN ? 1 : Int(audioManager.sequencer.currentRelativePosition.beats)
@@ -528,13 +529,14 @@ class GameScene: SKScene {
                 }
                 if let name = node.name {
                     if name == "playButton" {
-                        node.playPressedAnimation()
+                        
+                        node.playPressedAnimation(false)
                         node.name = "stopButton"
                         audioManager.play()
                     }
                     else if name == "stopButton"{
                         
-                        node.playPressedAnimation()
+                        node.playPressedAnimation(true)
                         node.name = "playButton"
                         if dnaMode {
                             
