@@ -31,9 +31,9 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
         switch segmentedControl.selectedSegmentIndex {
         case 0:
             
-            if scene!.currentSide == .left {
-                scene!.changeSide(to: .left)
-            }
+//            if scene!.currentSide == .left {
+//                scene!.changeSide(to: .left)
+//            }
             
             scene!.checkForLeftovers()
             //            scene!.dnaMode = false
@@ -57,9 +57,9 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
             scene!.resizeBases()
         case 2:
             
-            if scene!.currentSide == .right {
-                scene!.changeSide(to: .right)
-            }
+//            if scene!.currentSide == .right {
+//                scene!.changeSide(to: .right)
+//            }
             
             scene!.checkForLeftovers()
             //            scene!.dnaMode = false
