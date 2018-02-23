@@ -26,6 +26,7 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
     @IBOutlet weak var tempoStepper: UIStepper!
     
     private var requestState : States = .sending
+    private var oldIndex: Int = 0
     
     @IBAction func indexChanged(_ sender: Any) {
         switch segmentedControl.selectedSegmentIndex {
@@ -45,9 +46,12 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
             if scene!.currentSide != .left {
                 scene!.changeSide(to: .left)
             }
-            
+            oldIndex = 0
             
         case 1:
+            if oldIndex == 1 {
+                return
+            }
             self.hideNavigator()
             if scene!.audioManager.sequencer.isPlaying {
 //                scene!.playButton.playPressedAnimation(true)
@@ -58,8 +62,9 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
             scene!.playButton.name = "stopButton"
             scene!.audioManager.play()
             scene!.dnaMode = true
-            scene!.twist()
+            scene!.twist(false)
             scene!.resizeBases()
+            oldIndex = 1
         case 2:
             
 
@@ -75,7 +80,7 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
                 scene!.changeSide(to: .right)
                 
             }
-            
+            oldIndex = 2
         default:
             return
         }
@@ -250,6 +255,10 @@ class GameViewController: UIViewController, UINavigationControllerDelegate, MCBr
     
     func session(_ session: MCSession, didFinishReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, at localURL: URL?, withError error: Error?) {
         
+    }
+    
+    func getCurrentIndex() -> Int {
+        return segmentedControl.selectedSegmentIndex
     }
     
     

@@ -529,7 +529,19 @@ class GameScene: SKScene {
                 }
                 if let name = node.name {
                     if name == "playButton" {
-                        
+                        if gameSceneDelegate?.getCurrentIndex() == 1 {
+                            if audioManager.sequencer.isPlaying {
+                                //                scene!.playButton.playPressedAnimation(true)
+                            } else {
+                                node.playPressedAnimation(false)
+                            }
+                            
+                            node.name = "stopButton"
+                            audioManager.play()
+                            dnaMode = true
+                            twist(true)
+                            resizeBases()
+                        }
                         node.playPressedAnimation(false)
                         node.name = "stopButton"
                         audioManager.play()
@@ -1057,15 +1069,21 @@ class GameScene: SKScene {
         }
     }
     
-    public func twist() {
-        removeSelection(side: currentSide)
-        getOtherSide(side: currentSide)
+    public func twist(_ alreadyThere: Bool) {
+        if !alreadyThere {
+            removeSelection(side: currentSide)
+            getOtherSide(side: currentSide)
+        }
+
         alignParts()
         if currentSide == .left {
             for part in leftParts {
                 part.alpha = 1
             }
             for (index, part) in leftParts.enumerated() {
+                if alreadyThere {
+                    
+                }
                 let waitFirst = SKAction.wait(forDuration: 1.2)
                 let wait = SKAction.wait(forDuration: Double(index) / Double(6))
                 let move2 = SKAction.moveBy(x: self.frame.size.width / 1.6 - part.position.x, y: 0, duration: 1)

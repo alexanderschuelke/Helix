@@ -14,5 +14,5 @@ protocol GameDelegate {
     func swipeLeft()
     func swipeRight()
     func unhideNavigator()
-    
+    func getCurrentIndex() -> Int
 }
