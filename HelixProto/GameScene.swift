@@ -411,6 +411,7 @@ class GameScene: SKScene {
                         // Get next base of same type
                         reloadSample(for: currentBase)
                         removeSelectionFrame()
+                        audioManager.updateLoop()
                         return
                     }
                 }
